@@ -1,0 +1,1 @@
+typealias Satoshi = Long
