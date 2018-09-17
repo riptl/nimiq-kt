@@ -30,7 +30,7 @@ class BlockBody(
         var previousTx: Transaction? = null
         for (tx in transactions) {
             // Ensure transactions are ordered and unique.
-            if (previousTx != null && previousTx.compareBlockOrder(tx) >= 0) {
+            if (previousTx != null && previousTx >= tx) {
                 return false
             }
             previousTx = tx
@@ -44,7 +44,7 @@ class BlockBody(
         var previousAcc: PrunedAccount? = null
         for (acc in prunedAccounts) {
             // Ensure pruned accounts are ordered and unique.
-            if (previousAcc != null && previousAcc > acc) {
+            if (previousAcc != null && previousAcc >= acc) {
                 return false
             }
             previousAcc = acc
@@ -67,6 +67,35 @@ class BlockBody(
         transactions.forEach { it.serialize(s) }
         s.writeUShort(prunedAccounts.size)
         prunedAccounts.forEach{ it.serialize(s) }
+    }
+
+    val serializedSize: Int get() {
+        var size = 25 // Static fields
+        size += extraData.size
+        transactions.sumBy { it.serializedSize }
+        return size
+    }
+
+    private var _hash: HashLight? = null
+    val hash: HashLight get() {
+        if (_hash == null)
+            _hash = MerkleTree.computeRoot(getMerkleLeafs())
+        return _hash!!
+    }
+
+    private fun getMerkleLeafs() = ArrayList<HashLight>().apply {
+        add(minerAddr.hash)
+        add(HashLight(extraData))
+        addAll(transactions.map { it.hash })
+        addAll(prunedAccounts.map { it.hash })
+    }
+
+    fun getAddresses() = ArrayList<Address>().apply {
+        add(minerAddr)
+        for (tx in transactions) {
+            add(tx.sender)
+            add(tx.recipient)
+        }
     }
 
 }

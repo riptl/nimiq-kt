@@ -1,5 +1,6 @@
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.io.OutputStream
 
 class BasicTransaction(
         val senderPubKey: PublicKeyNim,
@@ -7,7 +8,7 @@ class BasicTransaction(
         value: Satoshi,
         fee: Satoshi,
         validityStartHeight: UByte,
-        val networkId: UByte,
+        networkId: UByte,
         val signature: SignatureNim
 ) : Transaction(
         senderPubKey.toAddress(),
@@ -44,7 +45,35 @@ class BasicTransaction(
         }
     }
 
+    override fun serialize(s: OutputStream) {
+        s.writeUByte(Transaction.Format.BASIC.ordinal)
+        senderPubKey.serialize(s)
+        recipient.serialize(s)
+        s.writeULong(value)
+        s.writeULong(fee)
+        s.writeUInt(validityStartHeight)
+        s.writeUByte(networkId)
+        signature.serialize(s)
+    }
+
+    override val serializedSize: Int
+        get() = 138
+
     override val format: Format
         get() = Transaction.Format.BASIC
+
+    override fun getContactCreationAddress(): Address {
+        val s = ByteArrayOutputStream()
+        s.writeUByte(Transaction.Format.BASIC.ordinal)
+        senderPubKey.serialize(s)
+        Address.NULL.serialize(s) // NULL recipient
+        s.writeULong(value)
+        s.writeULong(fee)
+        s.writeUInt(validityStartHeight)
+        s.writeUByte(networkId)
+        signature.serialize(s)
+
+        return Address.fromHash(HashLight(s.toByteArray()))
+    }
 
 }

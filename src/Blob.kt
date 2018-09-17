@@ -2,11 +2,22 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
 
-open class Blob(val size: Int): Comparable<Blob> {
+open class Blob: Comparable<Blob> {
 
-    val buf = ByteArray(size)
+    val size: Int
+    val buf: ByteArray
 
-    fun hash() = HashLight(buf)
+    constructor(size: Int) {
+        this.size = size
+        this.buf = ByteArray(size)
+    }
+
+    constructor(buf: ByteArray) {
+        this.size = buf.size
+        this.buf = buf
+    }
+
+    val hash get() = HashLight(buf)
 
     fun copyFrom(src: ByteArray) =
         if (src.size == size)
@@ -18,7 +29,7 @@ open class Blob(val size: Int): Comparable<Blob> {
 
     fun serialize(s: OutputStream) = s.write(buf)
 
-    fun unserialize(s: InputStream) = readFull(s, buf)
+    fun unserialize(s: InputStream) = s.readFull(buf)
 
     override fun equals(other: Any?) =
         if (other is Blob)

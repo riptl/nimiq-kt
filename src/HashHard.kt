@@ -8,4 +8,6 @@ class HashHard() : Blob(SIZE) {
         Native.nimiqArgon2d(buf, input)
     }
 
+    fun toGeneric() = Hash(Hash.Algorithm.ARGON2D)
+
 }

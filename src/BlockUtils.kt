@@ -29,12 +29,30 @@ object BlockUtils {
     fun getTargetHeight(target: BigInteger): Int =
         ceil(log2(target.toDouble())).toInt()
 
+    fun getTargetDepth(target: BigInteger): Int =
+        getTargetHeight(Policy.BLOCK_TARGET_MAX) - getTargetHeight(target)
+
     fun compactToDifficulty(compact: UInt): BigInteger =
         Policy.BLOCK_TARGET_MAX / compactToTarget(compact)
+
+    fun targetToDifficulty(target: BigInteger): BigInteger =
+        Policy.BLOCK_TARGET_MAX / target
+
+    fun hashToTarget(hash: Hash) =
+        BigInteger(1, hash.buf)
+
+    fun realDifficulty(hash: Hash) =
+        targetToDifficulty(hashToTarget(hash))
+
+    fun getHashDepth(hash: Hash) =
+        getTargetDepth(hashToTarget(hash))
 
     fun isProofOfWork(hash: HashHard, target: BigInteger): Boolean {
         val hashInt = BigInteger(1, hash.buf)
         return hashInt <= target
     }
+
+    fun powerOfTwo(exp: Int) =
+        BigInteger.ONE shl exp
 
 }

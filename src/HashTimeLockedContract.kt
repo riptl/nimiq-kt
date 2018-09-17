@@ -17,8 +17,8 @@ class HashTimeLockedContract(
 
             val sender = Address().apply { unserialize(s) }
             val recipient = Address().apply { unserialize(s) }
-            val hashAlgorithm = s.readUByte()
-            //val hashRoot = HashLight().unserialize(s)
+            val hashAlgorithm = Hash.Algorithm.values()[s.readUByte()]
+            val hashRoot = Hash(hashAlgorithm).apply { unserialize(s) }
             val hashCount = s.readUByte()
             val timeout = s.readUInt()
             val totalAmount = s.readULong()
@@ -45,41 +45,40 @@ class HashTimeLockedContract(
             }
         }
 
-        fun verifyOutgoingTransaction(transaction: Transaction): Boolean {
+        fun verifyOutgoingTransaction(tx: Transaction): Boolean {
             try {
-                val s = ByteArrayInputStream(transaction.proof)
+                val s = ByteArrayInputStream(tx.proof)
                 val type = ProofType.values()[s.readUByte()]
                 when (type) {
                     ProofType.REGULAR_TRANSFER -> {
                         val hashAlgorithm = Hash.Algorithm.values()[s.readUByte()]
                         val hashDepth = s.readUByte()
-                        //val hashRoot = Hash…
-                        //val preImage
+                        val hashRoot = Hash(hashAlgorithm).apply{ unserialize(s) }
+                        val preImage = Hash(hashAlgorithm).apply{ unserialize(s) }
 
                         // Verify that the preImage hashed hashDepth times matches the _provided_ hashRoot.
-                        //for (i in 0 until hashDepth) {
-                        //    preImage = Hash.compute(preImage.array, )
-                        //}
+                        for (i in 0 until hashDepth)
+                            preImage.compute(preImage.buf)
 
-                        //if (hashRoot != preImage)
-                        //    return false
+                        if (hashRoot != preImage)
+                            return false
 
                         // Signature proof of the HTLC recipient
-                        if (!SignatureProof.unserialize(s).verify(null, transaction.serializeContent()))
+                        if (!SignatureProof.unserialize(s).verify(null, assemble { tx.serializeContent(it) }))
                             return false
                     }
                     ProofType.EARLY_RESOLVE -> {
                         // Signature proof of the HTLC recipient
-                        if (!SignatureProof.unserialize(s).verify(null, transaction.serializeContent()))
+                        if (!SignatureProof.unserialize(s).verify(null, assemble { tx.serializeContent(it) }))
                             return false
 
                         // Signature proof of the HTLC creator
-                        if (!SignatureProof.unserialize(s).verify(null, transaction.serializeContent()))
+                        if (!SignatureProof.unserialize(s).verify(null, assemble { tx.serializeContent(it) }))
                             return false
                     }
                     ProofType.TIMEOUT_RESOLVE -> {
                         // Signature proof of the HTLC creator
-                        if (!SignatureProof.unserialize(s).verify(null, transaction.serializeContent()))
+                        if (!SignatureProof.unserialize(s).verify(null, assemble { tx.serializeContent(it) }))
                             return false
                     }
                     else ->
@@ -100,7 +99,10 @@ class HashTimeLockedContract(
     override val type: Type
         get() = Account.Type.HTLC
 
-    fun withOutgoingTransaction(transaction: Transaction, blockHeight: UInt, txCache: TransactionsCache, revert: Boolean = false) {
+    override fun withBalance(balance: Satoshi): Account =
+        HashTimeLockedContract(balance, sender, recipient, hashRoot, hashCount, hashCount, totalAmount)
+
+    override fun withOutgoingTransaction(transaction: Transaction, blockHeight: UInt, txCache: TransactionsCache, revert: Boolean = false) {
         val s = ByteArrayInputStream(transaction.proof)
         val type = ProofType.values()[s.readUByte()]
         var minCap = 0

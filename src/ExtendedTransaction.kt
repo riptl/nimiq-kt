@@ -64,4 +64,9 @@ class ExtendedTransaction(
         s.write(proof)
     }
 
+    override val serializedSize: Int
+        get() {
+            var v = 3 // Static fields
+            v +=
+        }
 }

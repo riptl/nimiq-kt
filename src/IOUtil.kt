@@ -74,5 +74,5 @@ fun OutputStream.writeULong(x: ULong) {
     write((x shr 56).toInt())
 }
 
-fun assembleArray(f: (ByteArrayOutputStream) -> Unit): ByteArray =
+fun assemble(f: (ByteArrayOutputStream) -> Unit): ByteArray =
     ByteArrayOutputStream().apply{f(this)}.toByteArray()

@@ -53,7 +53,7 @@ class BlockHeader(
     val hash: HashLight
         get() {
             if (_hash == null)
-                _hash = HashLight(assembleArray{serialize(it)})
+                _hash = HashLight(assemble{serialize(it)})
             return _hash!!
         }
 
@@ -61,7 +61,7 @@ class BlockHeader(
     val pow: HashHard
         get() {
             if (_pow == null)
-                _pow = HashHard(assembleArray{serialize(it)})
+                _pow = HashHard(assemble{serialize(it)})
             return _pow!!
         }
 

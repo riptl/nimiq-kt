@@ -28,7 +28,7 @@ abstract class Account : Serializable {
     abstract val type: Type
     var balance: Satoshi = 0
 
-    fun withIncomingTransaction(transaction: Transaction, blockHeight: UInt, revert: Boolean = false): Account {
+    open fun withIncomingTransaction(transaction: Transaction, blockHeight: UInt, revert: Boolean = false): Account {
         return if (!revert) {
             withBalance(balance + transaction.value)
         } else {
@@ -39,7 +39,7 @@ abstract class Account : Serializable {
         }
     }
 
-    fun withOutgoingTransaction(transaction: Transaction, blockHeight: UInt, txCache: TransactionsCache, revert: Boolean = false): Account {
+    open fun withOutgoingTransaction(transaction: Transaction, blockHeight: UInt, txCache: TransactionsCache, revert: Boolean = false): Account {
         return if (!revert) {
             val sub = transaction.value + transaction.fee
             // TODO Check for integer overflows

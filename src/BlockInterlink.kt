@@ -1,4 +1,5 @@
 import java.io.InputStream
+import java.io.OutputStream
 import kotlin.experimental.or
 import kotlin.math.ceil
 
@@ -50,5 +51,29 @@ class BlockInterlink(
             return BlockInterlink(hashes, prevHash, repeatBits, compressed)
         }
     }
+
+    fun serialize(s: OutputStream) {
+        s.writeUByte(hashes.size)
+        s.write(repeatBits)
+        for (hash in compressed)
+            hash.serialize(s)
+    }
+
+    val serializedSize: Int
+        get() = 1 + repeatBits.size +
+            HashLight.SIZE * compressed.size
+
+    private var _hash: HashLight? = null
+    val hash: HashLight
+        get() {
+            if (_hash == null) {
+                val hashes = ArrayList<HashLight>()
+                hashes += HashLight(this.repeatBits)
+                hashes += GenesisConfig.genesisHash
+                hashes.addAll(compressed)
+                _hash = MerkleTree.computeRoot(hashes)
+            }
+            return _hash!!
+        }
 
 }

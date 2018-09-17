@@ -6,9 +6,10 @@ class HashLight() : Blob(SIZE) {
         const val SIZE = 32
     }
 
-    constructor(input: ByteArray) : this() {
+    constructor(vararg inputs: ByteArray) : this() {
         val d = Blake2bDigest()
-        d.update(input, 0, input.size)
+        for (input in inputs)
+            d.update(input, 0, input.size)
         d.doFinal(buf, 0)
     }
 
