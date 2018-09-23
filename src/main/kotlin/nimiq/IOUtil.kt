@@ -15,25 +15,35 @@ fun InputStream.readFull(b: ByteArray) {
     }
 }
 
-fun InputStream.readUByte(): Int {
+@ExperimentalUnsignedTypes
+fun InputStream.readUByte(): UByte {
     val n = read()
-    return if (n > 0) n
+    return if (n > 0) n.toUByte()
         else throw EOFException()
 }
 
-fun OutputStream.writeUByte(x: Int) = write(x)
+@ExperimentalUnsignedTypes
+fun OutputStream.writeUByte(x: Int) = writeUByte(x.toUByte())
+@ExperimentalUnsignedTypes
+fun OutputStream.writeUByte(x: UByte) = write(x.toInt())
 
-fun InputStream.readUShort(): Int {
+@ExperimentalUnsignedTypes
+fun InputStream.readUShort(): UShort {
     val buf = readFull(2)
-    return (buf[0].toInt() shl 8) or
-        buf[1].toInt()
+    return ((buf[0].toInt() shl 8) or
+        buf[1].toInt()).toUShort()
 }
 
-fun OutputStream.writeUShort(x: Int) {
+@ExperimentalUnsignedTypes
+fun OutputStream.writeUShort(x: Int) = writeUShort(x.toUShort())
+@ExperimentalUnsignedTypes
+fun OutputStream.writeUShort(_x: UShort) {
+    val x = _x.toInt()
     write(x)
     write(x shr 8)
 }
 
+@ExperimentalUnsignedTypes
 fun InputStream.readUInt(): UInt {
     val buf = readFull(4)
     return (
@@ -44,13 +54,15 @@ fun InputStream.readUInt(): UInt {
     ).toUInt()
 }
 
+@ExperimentalUnsignedTypes
 fun OutputStream.writeUInt(x: UInt) {
-    write(x)
-    write(x shr  8)
-    write(x shr 16)
-    write(x shr 24)
+    write(((x       ) and 0xFF).toInt())
+    write(((x shr  8) and 0xFF).toInt())
+    write(((x shr 16) and 0xFF).toInt())
+    write(((x shr 24) and 0xFF).toInt())
 }
 
+@ExperimentalUnsignedTypes
 fun InputStream.readULong(): ULong {
     val buf = readFull(8)
     return (
@@ -65,6 +77,7 @@ fun InputStream.readULong(): ULong {
     ).toULong()
 }
 
+@ExperimentalUnsignedTypes
 fun OutputStream.writeULong(x: ULong) {
     write(x.toInt())
     write((x shr  8).toInt())

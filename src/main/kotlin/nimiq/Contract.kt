@@ -1,5 +1,6 @@
 package com.terorie.nimiq
 
+@ExperimentalUnsignedTypes
 abstract class Contract(balance: Satoshi) : Account() {
 
     companion object {
@@ -20,14 +21,14 @@ abstract class Contract(balance: Satoshi) : Account() {
         this.balance = balance
     }
 
-    override fun withIncomingTransaction(transaction: Transaction, blockHeight: UInt, revert: Boolean = false): Account {
-        if (!revert && (transaction.flags and Transaction.FLAG_CONTACT_CREATION) != 0)
+    override fun withIncomingTransaction(transaction: Transaction, blockHeight: UInt, revert: Boolean): Account {
+        if (!revert && (transaction.flags and Transaction.FLAG_CONTACT_CREATION) != 0.toUByte())
             throw IllegalArgumentException("Contract already created")
         return super.withIncomingTransaction(transaction, blockHeight, revert)
     }
 
     fun withContractCommand(transaction: Transaction, blockHeight: UInt, revert: Boolean = false): Account {
-        if (revert && (transaction.flags and Transaction.FLAG_CONTACT_CREATION) != 0)
+        if (revert && (transaction.flags and Transaction.FLAG_CONTACT_CREATION) != 0.toUByte())
             return BasicAccount(balance)
         return this
     }

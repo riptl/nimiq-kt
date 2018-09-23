@@ -3,6 +3,7 @@ package com.terorie.nimiq
 import java.io.InputStream
 import java.io.OutputStream
 
+@ExperimentalUnsignedTypes
 class ExtendedTransaction(
     sender: Address,
     senderType: Account.Type,
@@ -10,40 +11,43 @@ class ExtendedTransaction(
     recipientType: Account.Type,
     value: Satoshi,
     fee: Satoshi,
-    validityStartHeight: UByte,
+    validityStartHeight: UInt,
     flags: UByte,
     data: ByteArray,
-    proof: ByteArray
+    proof: ByteArray,
+    networkID: UByte
 ) : Transaction(
     sender, senderType,
     recipient, recipientType,
     value, fee,
     validityStartHeight, flags,
-    data, proof
+    data, proof,
+    networkID
 ) {
 
     companion object {
         fun unserialize(s: InputStream, needType: Boolean = true): ExtendedTransaction {
             if (!needType) {
                 val type = s.readUByte()
-                assert(type == Transaction.Format.EXTENDED.ordinal)
+                assert(type == Transaction.Format.EXTENDED.id)
             }
 
             val dataSize = s.readUShort()
-            val data = s.readFull(dataSize)
+            val data = s.readFull(dataSize.toInt())
             val sender = Address().apply { unserialize(s) }
-            val senderType = Account.Type.values()[s.readUByte()]
+            val senderType = Account.Type.byID(s.readUByte())
             val recipient = Address().apply { unserialize(s) }
-            val recipientType = Account.Type.values()[s.readUByte()]
+            val recipientType = Account.Type.byID(s.readUByte())
             val value = s.readULong()
             val fee = s.readULong()
-            val vsh = s.readUByte()
+            val vsh = s.readUInt()
+            val networkID = s.readUByte()
             val flags = s.readUByte()
             val proofSize = s.readUShort()
-            val proof = s.readFull(proofSize)
+            val proof = s.readFull(proofSize.toInt())
             return ExtendedTransaction(
                 sender, senderType, recipient, recipientType,
-                value, fee, vsh, flags, data, proof)
+                value, fee, vsh, flags, data, proof, networkID)
         }
     }
 
@@ -51,24 +55,25 @@ class ExtendedTransaction(
         get() = Transaction.Format.EXTENDED
 
     override fun serialize(s: OutputStream) {
-        s.writeUByte(Transaction.Format.EXTENDED.ordinal)
-        s.writeUShort(data.size)
+        s.writeUByte(Transaction.Format.EXTENDED.id)
+        s.writeUShort(data.size.toUShort())
         s.write(data)
         sender.serialize(s)
-        s.writeUByte(senderType.ordinal)
+        s.writeUByte(senderType.id)
         recipient.serialize(s)
-        s.writeUByte(recipientType.ordinal)
+        s.writeUByte(recipientType.id)
         s.writeULong(value)
         s.writeULong(fee)
-        s.writeUByte(validityStartHeight)
+        s.writeUInt(validityStartHeight)
         s.writeUByte(flags)
-        s.writeUShort(proof.size)
+        s.writeUShort(proof.size.toUShort())
         s.write(proof)
     }
 
-    override val serializedSize: Int
+    override val serializedSize: UInt
         get() {
-            var v = 3 // Static fields
-            v +=
+            var v = 3U // Static fields
+            v += proof.size.toUInt()
+            return v
         }
 }

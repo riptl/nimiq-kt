@@ -1,8 +1,8 @@
 package com.terorie.nimiq
 
 import java.io.ByteArrayInputStream
-import kotlin.math.max
 
+@ExperimentalUnsignedTypes
 class HashTimeLockedContract(
         balance: Satoshi,
         val sender: Address,
@@ -19,7 +19,7 @@ class HashTimeLockedContract(
 
             val sender = Address().apply { unserialize(s) }
             val recipient = Address().apply { unserialize(s) }
-            val hashAlgorithm = Hash.Algorithm.values()[s.readUByte()]
+            val hashAlgorithm = Hash.Algorithm.byID(s.readUByte())
             val hashRoot = Hash(hashAlgorithm).apply { unserialize(s) }
             val hashCount = s.readUByte()
             val timeout = s.readUInt()
@@ -33,7 +33,7 @@ class HashTimeLockedContract(
 
                 s.skip(20) // Skip sender address
                 s.skip(20) // Skip recipient address
-                val hashAlgorithm = Hash.Algorithm.values()[s.readUByte()]
+                val hashAlgorithm = Hash.Algorithm.byID(s.readUByte())
                 if (hashAlgorithm == Hash.Algorithm.INVALID ||
                         hashAlgorithm == Hash.Algorithm.ARGON2D)
                     return false
@@ -50,16 +50,16 @@ class HashTimeLockedContract(
         fun verifyOutgoingTransaction(tx: Transaction): Boolean {
             try {
                 val s = ByteArrayInputStream(tx.proof)
-                val type = ProofType.values()[s.readUByte()]
+                val type = ProofType.byID(s.readUByte())
                 when (type) {
                     ProofType.REGULAR_TRANSFER -> {
-                        val hashAlgorithm = Hash.Algorithm.values()[s.readUByte()]
+                        val hashAlgorithm = Hash.Algorithm.byID(s.readUByte())
                         val hashDepth = s.readUByte()
                         val hashRoot = Hash(hashAlgorithm).apply{ unserialize(s) }
                         val preImage = Hash(hashAlgorithm).apply{ unserialize(s) }
 
                         // Verify that the preImage hashed hashDepth times matches the _provided_ hashRoot.
-                        for (i in 0 until hashDepth)
+                        for (i in 0 until hashDepth.toInt())
                             preImage.compute(preImage.buf)
 
                         if (hashRoot != preImage)
@@ -102,12 +102,12 @@ class HashTimeLockedContract(
         get() = Account.Type.HTLC
 
     override fun withBalance(balance: Satoshi): Account =
-        HashTimeLockedContract(balance, sender, recipient, hashRoot, hashCount, hashCount, totalAmount)
+        HashTimeLockedContract(balance, sender, recipient, hashRoot, hashCount, timeout, totalAmount)
 
-    override fun withOutgoingTransaction(transaction: Transaction, blockHeight: UInt, txCache: TransactionsCache, revert: Boolean = false) {
+    override fun withOutgoingTransaction(transaction: Transaction, blockHeight: UInt, txCache: TransactionCache, revert: Boolean): Account {
         val s = ByteArrayInputStream(transaction.proof)
-        val type = ProofType.values()[s.readUByte()]
-        var minCap = 0
+        val type = ProofType.byID(s.readUByte())
+        var minCap = 0UL
         when (type) {
             ProofType.REGULAR_TRANSFER -> {
                 // Check that the contract has not expired yet
@@ -115,7 +115,7 @@ class HashTimeLockedContract(
                     throw IllegalArgumentException("Contract expired")
 
                 // Check that the provided hashRoot is correct
-                val hashAlgorithm = Hash.Algorithm.values()[s.readUByte()]
+                val hashAlgorithm = Hash.Algorithm.byID(s.readUByte())
                 val hashDepth = s.readUByte()
                 val _hashRoot = Hash(hashAlgorithm).apply { unserialize(s) }
                 if (_hashRoot != hashRoot)
@@ -128,7 +128,9 @@ class HashTimeLockedContract(
                 if (!SignatureProof.unserialize(s).isSignedBy(recipient))
                     throw IllegalArgumentException("Proof error")
 
-                minCap = max(0, (1 - (hashDepth / hashCount) * totalAmount))
+                minCap =
+                    if (hashDepth > hashCount) 0U
+                    else totalAmount
             }
             ProofType.EARLY_RESOLVE -> {
                 // Signature proof of the HTLC recipient
@@ -157,16 +159,22 @@ class HashTimeLockedContract(
                 throw IllegalArgumentException("Balance error")
         }
 
-        return super.withOutgoingTransaction(transaction, blockHeight, transactionsCache, revert)
+        return super.withOutgoingTransaction(transaction, blockHeight, txCache, revert)
     }
 
-    fun withIncomingTransaction(transaction: Transaction,)
+    override fun withIncomingTransaction(transaction: Transaction, blockHeight: UInt, revert: Boolean): Account {
+        throw IllegalArgumentException("illegal incoming transaction")
+    }
 
     enum class ProofType {
         INVALID,
         REGULAR_TRANSFER,
         EARLY_RESOLVE,
-        TIMEOUT_RESOLVE
+        TIMEOUT_RESOLVE;
+
+        companion object {
+            fun byID(id: UByte) = values()[id.toInt()]
+        }
     }
 
 }

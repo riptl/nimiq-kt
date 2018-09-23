@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.OutputStream
 
+@ExperimentalUnsignedTypes
 class SignatureProof(
         val publicKey: PublicKeyNim,
         val merklePath: MerklePath,

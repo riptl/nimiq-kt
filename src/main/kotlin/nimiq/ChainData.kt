@@ -1,9 +1,9 @@
 package com.terorie.nimiq
 
-import BlockUtils.getHashDepth
-import BlockUtils.realDifficulty
+import com.terorie.nimiq.BlockUtils.realDifficulty
 import java.math.BigInteger
 
+@ExperimentalUnsignedTypes
 class ChainData(
     val head: Block,
     val totalDifficulty: BigInteger,
@@ -21,15 +21,15 @@ class ChainData(
         return ChainData(block, totalDifficulty, totalWork, superBlockCounts)
     }
 
-    class SuperBlockCounts(val list: ArrayList<UByte> = ArrayList<UByte>()) {
+    class SuperBlockCounts(val list: ArrayList<UByte> = ArrayList()) {
 
         fun add(depth: UByte) {
-            for (i in 0..depth)
+            for (i in 0 until depth.toInt())
                 list[i] = (list.getOrNull(i) ?: 0) + 1
         }
 
         fun subtract(depth: UByte) {
-            for (i in 0..depth) {
+            for (i in 0 until depth.toInt()) {
                 list[i]--
                 assert(list[i] >= 0)
             }

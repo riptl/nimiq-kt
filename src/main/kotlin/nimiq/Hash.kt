@@ -4,6 +4,7 @@ import org.bouncycastle.crypto.digests.Blake2bDigest
 import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.digests.SHA512Digest
 
+@ExperimentalUnsignedTypes
 class Hash(val algorithm: Algorithm) : Blob(algorithm.size) {
 
     enum class Algorithm(val size: Int) {
@@ -11,7 +12,11 @@ class Hash(val algorithm: Algorithm) : Blob(algorithm.size) {
         BLAKE2B(32),
         ARGON2D(32),
         SHA256(32),
-        SHA512(64)
+        SHA512(64);
+
+        companion object {
+            fun byID(id: UByte) = values()[id.toInt()]
+        }
     }
 
     companion object {

@@ -5,6 +5,7 @@ import java.io.OutputStream
 import kotlin.experimental.or
 import kotlin.math.ceil
 
+@ExperimentalUnsignedTypes
 class BlockInterlink(
     val hashes: ArrayList<HashLight>,
     val prevHash: HashLight,
@@ -34,17 +35,17 @@ class BlockInterlink(
 
         fun unserialize(s: InputStream, prevHash: HashLight): BlockInterlink {
             val count = s.readUByte()
-            val repeatBitsSize = ceil(count / 8.0).toInt()
+            val repeatBitsSize = ceil(count.toInt() / 8.0).toInt()
             val repeatBits = s.readFull(repeatBitsSize)
 
             var hash = prevHash
             val hashes = ArrayList<HashLight>()
             val compressed = ArrayList<HashLight>()
-            for (i in 0 until count) {
+            for (i in 0 until count.toInt()) {
                 val maskBit = (1 shl (7 - (i % 8))).toByte()
                 val repeated = (repeatBits[i/8] or maskBit) != 0.toByte()
                 if (!repeated) {
-                    hash = HashLight().unserialize(s)
+                    hash = HashLight().apply { unserialize(s) }
                     compressed += hash
                 }
                 hashes += hash
@@ -55,7 +56,8 @@ class BlockInterlink(
     }
 
     fun serialize(s: OutputStream) {
-        s.writeUByte(hashes.size)
+        // TODO Overflow check
+        s.writeUByte(hashes.size.toUByte())
         s.write(repeatBits)
         for (hash in compressed)
             hash.serialize(s)

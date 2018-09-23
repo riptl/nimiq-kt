@@ -1,9 +1,10 @@
 package com.terorie.nimiq
 
+@ExperimentalUnsignedTypes
 object GenesisConfig {
 
     var initialized = false
-    lateinit var networkID: UByte
+    var networkID: UByte = 0U
     lateinit var networkName: String
     lateinit var seedPeers: ArrayList<WssPeerAddress>
     lateinit var seedLists: ArrayList<SeedListURL>
@@ -17,7 +18,7 @@ object GenesisConfig {
     }
 
     fun main() {
-        networkID = 42
+        networkID = 42U
         networkName = "main"
         
     }

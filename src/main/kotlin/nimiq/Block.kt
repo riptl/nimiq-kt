@@ -1,13 +1,14 @@
 package com.terorie.nimiq
 
-import BlockUtils.getHashDepth
-import BlockUtils.getTargetDepth
+import com.terorie.nimiq.BlockUtils.getHashDepth
+import com.terorie.nimiq.BlockUtils.getTargetDepth
 import java.io.InputStream
 import java.io.OutputStream
 import java.math.BigInteger
 import java.util.*
 import kotlin.math.max
 
+@ExperimentalUnsignedTypes
 class Block(
     val header: BlockHeader,
     val interlink: BlockInterlink,
@@ -20,7 +21,7 @@ class Block(
             val interlink = BlockInterlink.unserialize(s, header.prevHash)
 
             var body: BlockBody? = null
-            val bodyPresent = s.readUByte()
+            val bodyPresent = s.readUByte().toInt()
             if (bodyPresent != 0)
                 body = BlockBody.unserialize(s)
 
@@ -90,7 +91,7 @@ class Block(
 
         // Check that the interlinkHash given in the header matches the actual interlinkHash.
         if (header.interlinkHash != interlink.hash) {
-            return false;
+            return false
         }
 
         // Everything checks out.
@@ -136,10 +137,10 @@ class Block(
         }
 
         // Check that the predecessor is contained in this block's interlink and verify its position.
-        val prevHash = predecessor.hash
-        if (!GenesisConfig.genesisHash == prevHash) {
+        val prevHash = predecessor.header.hash
+        if (GenesisConfig.genesisHash != prevHash) {
             val prevPow = predecessor.header.pow
-            val targetHeight = BlockUtils.getTargetHeight(target)
+            val targetHeight = BlockUtils.getTargetHeight(header.target)
             var blockFound = false
 
             for (depth in 0 until interlink.hashes.size) {
@@ -164,7 +165,7 @@ class Block(
                 return false
             }
 
-            val interlink = predecessor.getNextInterlink(target, version)
+            val interlink = predecessor.getNextInterlink(header.target, header.version)
             if (header.interlinkHash == interlink.hash) {
                 return false
             }
@@ -172,7 +173,7 @@ class Block(
         // Otherwise, if the prevHash doesn't match but the blocks should be adjacent according to their height fields,
         // this cannot be a valid successor of predecessor.
         else if (header.height == predecessor.header.height + 1) {
-            return false;
+            return false
         }
         // Otherwise, check that the interlink construction is valid given the information we have.
         else {
@@ -181,13 +182,13 @@ class Block(
             // The number of new blocks in the interlink is bounded by the height difference.
             val hashes = interlink.hashes.toHashSet()
             hashes.removeAll(predecessor.interlink.hashes)
-            if (hashes.size > header.height - predecessor.header.height) {
+            if (hashes.size.toUInt() > header.height - predecessor.header.height) {
                 return false
             }
 
             // Check that the interlink is not too short.
-            val thisDepth = BlockUtils.getTargetDepth(target)
-            val prevDepth = BlockUtils.getTargetDepth(predecessor.target)
+            val thisDepth = BlockUtils.getTargetDepth(header.target)
+            val prevDepth = BlockUtils.getTargetDepth(predecessor.header.target)
             val depthDiff = thisDepth - prevDepth
             if (interlink.hashes.size < predecessor.interlink.hashes.size - depthDiff) {
                 return false
@@ -202,7 +203,7 @@ class Block(
                 if (prevInterlink[i] == thisInterlink[i - depthDiff]) {
                     commonBlock = true
                 } else if (commonBlock) {
-                    return false;
+                    return false
                 }
                 i++
             }
@@ -237,7 +238,7 @@ class Block(
         for (i in interlinkOffset until interlink.hashes.size)
             hashes += interlink.hashes[i]
 
-        return BlockInterlink(hashes, header.hash)
+        return BlockInterlink.compress(hashes, header.hash)
     }
 
 }

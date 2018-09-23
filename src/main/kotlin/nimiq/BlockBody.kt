@@ -3,6 +3,7 @@ package com.terorie.nimiq
 import java.io.InputStream
 import java.io.OutputStream
 
+@ExperimentalUnsignedTypes
 class BlockBody(
         val minerAddr: Address,
         val transactions: ArrayList<Transaction>,
@@ -14,12 +15,12 @@ class BlockBody(
         fun unserialize(s: InputStream): BlockBody {
             val minerAddr = Address().apply{ unserialize(s) }
             val extraDataLen = s.readUByte()
-            val extraData = s.readFull(extraDataLen)
-            val numTxs = s.readUShort()
+            val extraData = s.readFull(extraDataLen.toInt())
+            val numTxs = s.readUShort().toInt()
             val txs = ArrayList<Transaction>(numTxs)
             for (i in 0 until numTxs)
                 txs[i] = Transaction.unserialize(s)
-            val numPrunedAccs = s.readUShort()
+            val numPrunedAccs = s.readUShort().toInt()
             val prunedAccs = ArrayList<PrunedAccount>()
             for (i in 0 until numPrunedAccs)
                 prunedAccs[i] = PrunedAccount.unserialize(s)
@@ -74,7 +75,7 @@ class BlockBody(
     val serializedSize: Int get() {
         var size = 25 // Static fields
         size += extraData.size
-        transactions.sumBy { it.serializedSize }
+        size += transactions.sumBy { it.serializedSize }
         return size
     }
 

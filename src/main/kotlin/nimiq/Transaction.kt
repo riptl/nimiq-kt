@@ -1,9 +1,12 @@
 package com.terorie.nimiq
 
 import org.bouncycastle.util.Arrays
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
+@ExperimentalUnsignedTypes
 abstract class Transaction(
     val sender: Address,
     val senderType: Account.Type,
@@ -19,11 +22,11 @@ abstract class Transaction(
 ) : Comparable<Transaction> {
 
     companion object {
-        const val FLAG_NONE: UByte = 0
-        const val FLAG_CONTACT_CREATION: UByte = 0b1
-        const val FLAG_ALL: UByte = 0b1
+        const val FLAG_NONE: UByte = 0U
+        const val FLAG_CONTACT_CREATION: UByte = 0b1U
+        const val FLAG_ALL: UByte = 0b1U
 
-        fun unserialize(s: InputStream) = when (s.readUByte()) {
+        fun unserialize(s: InputStream) = when (s.readUByte().toInt()) {
             Format.BASIC.ordinal ->
                 BasicTransaction.unserialize(s, needType = false)
             Format.EXTENDED.ordinal ->
@@ -32,23 +35,23 @@ abstract class Transaction(
         }
     }
 
-    enum class Format {
-        BASIC, EXTENDED
+    enum class Format(val id: UByte) {
+        BASIC(0), EXTENDED(1)
     }
 
     abstract val format: Format
 
     abstract fun serialize(s: OutputStream)
-    abstract val serializedSize: Int
+    abstract val serializedSize: UInt
 
     var _valid: Boolean? = null
-    fun verify(networkId: Int = GenesisConfig.networkID): Boolean {
+    fun verify(networkId: UByte = GenesisConfig.networkID): Boolean {
         if (_valid == null)
             _valid = _verify(networkId)
         return _valid!!
     }
 
-    private fun _verify(networkId: Int): Boolean {
+    private fun _verify(networkId: UByte): Boolean {
         if (networkId != this.networkId)
             return false
         if (sender == recipient)
@@ -68,7 +71,19 @@ abstract class Transaction(
             return _hash!!
         }
 
-    abstract fun getContactCreationAddress(): Address
+    open fun getContactCreationAddress(): Address {
+        // TODO Efficiency
+        // Copy with serialize/unserialize
+        val tx = Transaction.unserialize(
+            ByteArrayInputStream(
+                ByteArrayOutputStream()
+                    .apply{ serialize(this) }
+                    .toByteArray()
+            ))
+        Address.NULL.copyTo(tx.recipient)
+        tx._hash = null
+        return Address.fromHash(tx.hash)
+    }
 
     override fun compareTo(other: Transaction) = when {
         fee / serializedSize > other.fee / other.serializedSize -> -1
@@ -103,12 +118,13 @@ abstract class Transaction(
     }
 
     fun serializeContent(s: OutputStream) {
-        s.writeUShort(data.size)
+        // TODO Size check
+        s.writeUShort(data.size.toUShort())
         s.write(data)
         sender.serialize(s)
-        s.writeUByte(senderType.ordinal)
+        s.writeUByte(senderType.id)
         recipient.serialize(s)
-        s.writeUByte(recipientType.ordinal)
+        s.writeUByte(recipientType.id)
         s.writeULong(value)
         s.writeULong(fee)
         s.writeUInt(validityStartHeight)

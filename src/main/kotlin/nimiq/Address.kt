@@ -3,10 +3,12 @@ package com.terorie.nimiq
 import java.util.*
 import kotlin.math.ceil
 
-class Address : Blob(20) {
+class Address : Blob(SIZE) {
 
     companion object {
         const val CCODE = "NQ"
+        const val SIZE = 20
+
         val NULL = Address()
         val CONTRACT_CERATION = Address()
 

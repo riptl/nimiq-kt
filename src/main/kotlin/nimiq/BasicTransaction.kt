@@ -4,35 +4,37 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
+@ExperimentalUnsignedTypes
 class BasicTransaction(
-        val senderPubKey: PublicKeyNim,
-        recipient: Address,
-        value: Satoshi,
-        fee: Satoshi,
-        validityStartHeight: UByte,
-        networkId: UByte,
-        val signature: SignatureNim
+    val senderPubKey: PublicKeyNim,
+    recipient: Address,
+    value: Satoshi,
+    fee: Satoshi,
+    validityStartHeight: UInt,
+    networkId: UByte,
+    val signature: SignatureNim
 ) : Transaction(
-        senderPubKey.toAddress(),
-        Account.Type.BASIC,
-        recipient,
-        Account.Type.BASIC,
-        value,
-        fee,
-        validityStartHeight,
-        Transaction.FLAG_NONE,
-        ByteArray(0),
-        ByteArrayOutputStream().apply{
-            SignatureProof.singleSig(senderPubKey, signature).
-                    serialize(this)
-        }.toByteArray()
+    senderPubKey.toAddress(),
+    Account.Type.BASIC,
+    recipient,
+    Account.Type.BASIC,
+    value,
+    fee,
+    validityStartHeight,
+    Transaction.FLAG_NONE,
+    ByteArray(0),
+    ByteArrayOutputStream().apply{
+        SignatureProof.singleSig(senderPubKey, signature).
+                serialize(this)
+    }.toByteArray(),
+    networkId
 ) {
 
     companion object {
         fun unserialize(s: InputStream, needType: Boolean = true): BasicTransaction {
             if (!needType) {
                 val type = s.readUByte()
-                assert(type == Transaction.Format.BASIC.ordinal)
+                assert(type == Transaction.Format.BASIC.id)
             }
 
             return BasicTransaction(
@@ -40,7 +42,7 @@ class BasicTransaction(
                 recipient = Address().apply { unserialize(s) },
                 value = s.readULong(),
                 fee = s.readULong(),
-                validityStartHeight = s.readUByte(),
+                validityStartHeight = s.readUInt(),
                 networkId = s.readUByte(),
                 signature = SignatureNim().apply { unserialize(s) }
             )
@@ -48,7 +50,7 @@ class BasicTransaction(
     }
 
     override fun serialize(s: OutputStream) {
-        s.writeUByte(Transaction.Format.BASIC.ordinal)
+        s.writeUByte(Transaction.Format.BASIC.id)
         senderPubKey.serialize(s)
         recipient.serialize(s)
         s.writeULong(value)
@@ -58,15 +60,14 @@ class BasicTransaction(
         signature.serialize(s)
     }
 
-    override val serializedSize: Int
-        get() = 138
+    override val serializedSize get() = 138U
 
     override val format: Format
         get() = Transaction.Format.BASIC
 
     override fun getContactCreationAddress(): Address {
         val s = ByteArrayOutputStream()
-        s.writeUByte(Transaction.Format.BASIC.ordinal)
+        s.writeUByte(Transaction.Format.BASIC.id)
         senderPubKey.serialize(s)
         Address.NULL.serialize(s) // NULL recipient
         s.writeULong(value)

@@ -3,12 +3,18 @@ package com.terorie.nimiq
 import java.io.OutputStream
 import java.io.Serializable
 
+@ExperimentalUnsignedTypes
 abstract class Account : Serializable {
 
     enum class Type {
         BASIC,
         VESTING,
-        HTLC,
+        HTLC;
+
+        val id: UByte get() = ordinal.toUByte()
+        companion object {
+            fun byID(id: UByte) = values()[id.toInt()]
+        }
     }
 
     companion object {
@@ -16,19 +22,19 @@ abstract class Account : Serializable {
 
         fun verifyIncomingTransaction(type: Type, tx: Transaction) = when(type) {
             Type.BASIC -> BasicAccount.verifyIncomingTransaction(tx)
-            Type.VESTING -> VestingAccount.verifyIncomingTransaction(tx)
+            Type.VESTING -> VestingContract.verifyIncomingTransaction(tx)
             Type.HTLC -> HashTimeLockedContract.verifyIncomingTransaction(tx)
         }
 
         fun verifyOutgoingTransaction(type: Type, tx: Transaction) = when(type) {
             Type.BASIC -> BasicAccount.verifyOutgoingTransaction(tx)
-            Type.VESTING -> VestingAccount.verifyOutgoingTransaction(tx)
+            Type.VESTING -> VestingContract.verifyOutgoingTransaction(tx)
             Type.HTLC -> HashTimeLockedContract.verifyOutgoingTransaction(tx)
         }
     }
 
     abstract val type: Type
-    var balance: Satoshi = 0
+    var balance: Satoshi = 0UL
 
     open fun withIncomingTransaction(transaction: Transaction, blockHeight: UInt, revert: Boolean = false): Account {
         return if (!revert) {
@@ -41,8 +47,13 @@ abstract class Account : Serializable {
         }
     }
 
-    open fun withOutgoingTransaction(transaction: Transaction, blockHeight: UInt, txCache: TransactionsCache, revert: Boolean = false): Account {
-        return if (!revert) {
+    open fun withOutgoingTransaction(
+            transaction: Transaction,
+            blockHeight: UInt,
+            txCache: TransactionCache,
+            revert: Boolean = false
+    ): Account =
+        if (!revert) {
             val sub = transaction.value + transaction.fee
             // TODO Check for integer overflows
             if (sub > balance)
@@ -53,25 +64,24 @@ abstract class Account : Serializable {
             if (txCache.contains(transaction))
                 throw IllegalStateException("Double transaction error")
 
-            return withBalance(balance - sub)
+            withBalance(balance - sub)
         } else {
             if (blockHeight < transaction.validityStartHeight ||
                     blockHeight >= transaction.validityStartHeight + Policy.TRANSACTION_VALIDITY_WINDOW)
                 throw IllegalStateException("Validity error")
 
-            return withBalance(balance + transaction.value + transaction.fee)
+            withBalance(balance + transaction.value + transaction.fee)
         }
-    }
 
     abstract fun withBalance(balance: Satoshi): Account
 
     fun serialize(s: OutputStream) {
-        s.writeUByte(type.ordinal)
+        s.writeUByte(type.id)
         s.writeULong(balance)
     }
 
     fun isInitial() = this === Account.INITIAL
 
-    fun isToBePruned() = this.balance == 0L && !this.isInitial()
+    fun isToBePruned() = this.balance == 0UL && !this.isInitial()
 
 }

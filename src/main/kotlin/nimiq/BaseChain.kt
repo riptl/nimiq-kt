@@ -1,16 +1,20 @@
 package com.terorie.nimiq
 
 import java.math.BigInteger
+import kotlin.math.min
 
-class BaseChain(val store: ChainDataStore) : Blockchain {
+@ExperimentalUnsignedTypes
+abstract class BaseChain(val store: ChainDataStore) : Blockchain() {
 
-    fun getBlock(hash: HashLight, includeForks: Boolean = false, includeBoyd: Boolean = false): Block? {
+    abstract val mainChain: ChainData
+
+    fun getBlock(hash: HashLight, includeForks: Boolean = false, includeBody: Boolean = false): Block? {
         val chainData = store.getChainData(hash, includeBody)
         TODO()
     }
 
     fun getRawBlock(hash: HashLight, includeForks: Boolean = false) =
-        store.getRawStore(hahs, includeForks)
+        store.getRawBlock(hash, includeForks)
 
     fun getBlockAt(height: UInt, includeBody: Boolean = false) =
         store.getBlockAt(height, includeBody)
@@ -20,6 +24,39 @@ class BaseChain(val store: ChainDataStore) : Blockchain {
 
     fun getSuccessorBlocks(block: Block): List<Block> =
         store.getSuccessorBlocks(block)
+
+    fun getBlockLocators(): ArrayList<HashLight> {
+        // Push top 10 hashes first, then back off exponentially.
+        val locators = arrayListOf(this.headHash)
+
+        var block: Block? = head
+        for (i in (min(10, height.toLong()) - 1) until 0) {
+            if (block == null)
+                break
+            val prevHash = block.header.prevHash
+            locators.add(prevHash)
+            block = getBlock(prevHash)
+        }
+
+        var step = 2U
+        var i = height - 10 - step
+        while (i > 0) {
+            block = getBlockAt(i)
+            if (block != null)
+                locators.add(block.header.hash)
+            step *= 2
+            // TODO Respect max size for GetBlocksMessages
+            i -= step
+        }
+
+        // Push the genesis block hash.
+        if (locators.isEmpty() || locators.last() != GenesisConfig.genesisHash) {
+            // TODO Respect max size for GetBlocksMessages, make space for genesis hash if necessary
+            locators.add(GenesisConfig.genesisHash)
+        }
+
+        return locators
+    }
 
     fun getNextTarget(block: Block?, next: Block?): BigInteger? {
         var _block = block
@@ -35,7 +72,7 @@ class BaseChain(val store: ChainDataStore) : Blockchain {
         }
 
         if (_next != null) {
-            headData = headData.nextChainData(next)
+            headData = headData!!.nextChainData(_next)
             _block = _next
         }
 
@@ -44,7 +81,7 @@ class BaseChain(val store: ChainDataStore) : Blockchain {
         // Retrieve the timestamp of the block that appears DIFFICULTY_BLOCK_WINDOW blocks before the given block in the chain.
         // The block might not be on the main chain.
         val tailHeight: UInt =
-            if (Policy.DIFFICULTY_BLOCK_WINDOW >= _block.header.height) 1
+            if (Policy.DIFFICULTY_BLOCK_WINDOW >= _block.header.height) 1U
             else _block.header.height - Policy.DIFFICULTY_BLOCK_WINDOW
 
         var tailData: ChainData? = null
@@ -69,7 +106,7 @@ class BaseChain(val store: ChainDataStore) : Blockchain {
             // Not enough blocks are available to compute the next target, fail.
             return null
 
-        val deltaTotalDifficulty = headData.totalDifficulty - tailData.totalDifficulty
+        val deltaTotalDifficulty = headData!!.totalDifficulty - tailData.totalDifficulty
         return getNextTarget(headData.head.header, tailData.head.header, deltaTotalDifficulty)
     }
 

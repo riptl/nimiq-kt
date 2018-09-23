@@ -1,5 +1,6 @@
 package com.terorie.nimiq
 
+@ExperimentalUnsignedTypes
 class BasicAccount(balance: Satoshi) : Account() {
 
     init {
@@ -25,8 +26,14 @@ class BasicAccount(balance: Satoshi) : Account() {
 
     fun withContractCommand(tx: Transaction, blockHeight: UInt, revert: Boolean = false) {
         if (!revert && tx.recipientType !== Type.BASIC &&
-                tx.flags and Transaction.FLAG_CONTACT_CREATION != 0)
-            return Account.create(balance, blockHeight, tx)
+                tx.flags and Transaction.FLAG_CONTACT_CREATION != 0.toUByte())
+            when (tx.recipientType) {
+                Type.VESTING -> VestingContract.create(balance, blockHeight, tx)
+                Type.HTLC -> HashTimeLockedContract.create(balance, tx)
+                else -> throw IllegalArgumentException("not a known contract type")
+            }
+        else
+            this
     }
 
 }

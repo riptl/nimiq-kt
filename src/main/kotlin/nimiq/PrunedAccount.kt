@@ -3,6 +3,7 @@ package com.terorie.nimiq
 import java.io.InputStream
 import java.io.OutputStream
 
+@ExperimentalUnsignedTypes
 data class PrunedAccount(val address: Address, val account: Account): Comparable<PrunedAccount> {
 
     companion object {

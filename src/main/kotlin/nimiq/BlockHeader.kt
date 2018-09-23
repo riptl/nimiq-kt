@@ -1,9 +1,12 @@
 package com.terorie.nimiq
 
+import com.terorie.nimiq.BlockUtils.compactToDifficulty
+import com.terorie.nimiq.BlockUtils.compactToTarget
 import java.io.InputStream
 import java.io.OutputStream
 import java.math.BigInteger
 
+@ExperimentalUnsignedTypes
 class BlockHeader(
     val version: UShort,
     val prevHash: HashLight,
@@ -23,10 +26,10 @@ class BlockHeader(
 
         fun unserialize(s: InputStream) = BlockHeader (
             version = s.readUShort(),
-            prevHash = HashLight().unserialize(s),
-            interlinkHash = HashLight().unserialize(s),
-            bodyHash = HashLight().unserialize(s),
-            accountsHash = HashLight().unserialize(s),
+            prevHash = HashLight().apply { unserialize(s) },
+            interlinkHash = HashLight().apply { unserialize(s) },
+            bodyHash = HashLight().apply { unserialize(s) },
+            accountsHash = HashLight().apply { unserialize(s) },
             nBits = s.readUInt(),
             height = s.readUInt(),
             timestamp = s.readUInt(),
@@ -34,7 +37,7 @@ class BlockHeader(
         )
     }
 
-    var nonce: UInt = 0
+    var nonce: UInt = 0U
         set(value) {
             invalidateCache()
             field = value
@@ -46,10 +49,10 @@ class BlockHeader(
     }
 
     val target: BigInteger
-        get() = BlockUtils.compactToTarget(nBits)
+        get() = compactToTarget(nBits)
 
     val difficulty: BigInteger
-        get() = BlockUtils.compactToDifficulty(nBits)
+        get() = compactToDifficulty(nBits)
 
     var _hash: HashLight? = null
     val hash: HashLight
@@ -89,7 +92,7 @@ class BlockHeader(
 
     fun isImmediateSuccessorOf(prevHeader: BlockHeader): Boolean {
         // Check that the height is one higher than the previous height.
-        if (height !== prevHeader.height + 1)
+        if (height != prevHeader.height + 1)
             return false
 
         // Check that the timestamp is greater or equal to the predecessor's timestamp.

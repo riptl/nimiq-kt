@@ -3,12 +3,13 @@ package com.terorie.nimiq
 import java.math.BigInteger
 import kotlin.math.*
 
+@ExperimentalUnsignedTypes
 object BlockUtils {
 
     fun compactToTarget(compact: UInt): BigInteger {
-        val exp = 8 * ((compact shr 24) - 3)
+        val exp = 8 * ((compact shr 24) - 3).toInt()
         val base = BigInteger.ONE shl exp
-        val factor = BigInteger.valueOf(compact and 0xffffff)
+        val factor = BigInteger.valueOf(compact.toLong() and 0xffffff)
         return base * factor
     }
 
@@ -23,9 +24,9 @@ object BlockUtils {
 
         val followMask = 1 shl (size - 3) * 8
         val followBytesBig = target / BigInteger.valueOf(followMask.toLong())
-        val followBytes = followBytesBig.toInt()
+        val followBytes = followBytesBig.toInt().toUInt()
 
-        return (size shl 24) or (followBytes and 0xffffff)
+        return (size.toUInt() shl 24) or (followBytes and 0xffffff)
     }
 
     fun getTargetHeight(target: BigInteger): Int =

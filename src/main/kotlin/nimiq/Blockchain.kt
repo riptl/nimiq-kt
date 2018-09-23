@@ -1,7 +1,8 @@
 package com.terorie.nimiq
 
-interface Blockchain {
-    val head: Block
-    val headHash: HashLight
-    val height: UInt
+@ExperimentalUnsignedTypes
+abstract class Blockchain {
+    abstract val head: Block
+    abstract val headHash: HashLight
+    abstract val height: UInt
 }
