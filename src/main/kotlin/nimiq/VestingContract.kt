@@ -2,6 +2,7 @@ package com.terorie.nimiq
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.InputStream
 
 @ExperimentalUnsignedTypes
 class VestingContract(
@@ -73,6 +74,15 @@ class VestingContract(
 
             return true
         }
+
+        fun unserialize(s: InputStream) = VestingContract(
+            balance = s.readULong(),
+            owner = Address().apply { unserialize(s) },
+            vestingStart = s.readUInt(),
+            vestingStepBlocks = s.readUInt(),
+            vestingStepAmount = s.readULong(),
+            vestingTotalAmount = s.readULong()
+        )
     }
 
     override val type: Type

@@ -1,6 +1,7 @@
 package com.terorie.nimiq
 
 import java.io.ByteArrayInputStream
+import java.io.InputStream
 
 @ExperimentalUnsignedTypes
 class HashTimeLockedContract(
@@ -96,6 +97,16 @@ class HashTimeLockedContract(
                 return false
             }
         }
+
+        fun unserialize(s: InputStream) = HashTimeLockedContract(
+            balance = s.readULong(),
+            sender = Address().apply { unserialize(s) },
+            recipient = Address().apply { unserialize(s) },
+            hashRoot = Hash(Hash.Algorithm.byID(s.readUByte())).apply { unserialize(s) },
+            hashCount = s.readUByte(),
+            timeout = s.readUInt(),
+            totalAmount = s.readULong()
+        )
     }
 
     override val type: Type

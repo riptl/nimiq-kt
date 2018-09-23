@@ -70,10 +70,10 @@ class ExtendedTransaction(
         s.write(proof)
     }
 
-    override val serializedSize: UInt
+    override val serializedSize: Int
         get() {
-            var v = 3U // Static fields
-            v += proof.size.toUInt()
+            var v = 3 // Static fields
+            v += proof.size
             return v
         }
 }

@@ -1,5 +1,6 @@
 package com.terorie.nimiq
 
+import java.io.InputStream
 import java.io.OutputStream
 import java.io.Serializable
 
@@ -30,6 +31,12 @@ abstract class Account : Serializable {
             Type.BASIC -> BasicAccount.verifyOutgoingTransaction(tx)
             Type.VESTING -> VestingContract.verifyOutgoingTransaction(tx)
             Type.HTLC -> HashTimeLockedContract.verifyOutgoingTransaction(tx)
+        }
+
+        fun unserialize(s: InputStream) = when(Type.byID(s.readUByte())) {
+            Type.BASIC -> BasicAccount.unserialize(s)
+            Type.VESTING -> VestingContract.unserialize(s)
+            Type.HTLC -> HashTimeLockedContract.unserialize(s)
         }
     }
 

@@ -4,11 +4,11 @@ import java.math.BigInteger
 
 @ExperimentalUnsignedTypes
 object Policy {
-    const val BLOCK_TIME = 60
+    const val BLOCK_TIME = 60U
     const val BLOCK_SIZE_MAX = 100000
     val BLOCK_TARGET_MAX = BigInteger.ONE shl 240
     const val DIFFICULTY_BLOCK_WINDOW = 120U
-    const val DIFFICULTY_MAX_ADJUSTMENT_FACTOR = 2
+    const val DIFFICULTY_MAX_ADJUSTMENT_FACTOR = 2.0
     const val TRANSACTION_VALIDITY_WINDOW = 120U
     const val SATOSHIS_PER_COIN = 100000
     const val TOTAL_SUPPLY: Satoshi = 2100000000000000UL

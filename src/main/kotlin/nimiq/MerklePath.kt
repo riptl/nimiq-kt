@@ -5,7 +5,8 @@ import java.io.InputStream
 import java.io.OutputStream
 import kotlin.math.ceil
 
-class MerklePath(val nodes: ArrayList<Node> = ArrayList()) {
+@ExperimentalUnsignedTypes
+class MerklePath(val nodes: List<Node> = ArrayList()) {
 
     companion object {
         fun compute(values: List<HashLight>, leafHash: HashLight): MerklePath {
@@ -45,8 +46,18 @@ class MerklePath(val nodes: ArrayList<Node> = ArrayList()) {
             return Pair(hash, false)
         }
 
-        fun unserialize(i: InputStream): MerklePath {
+        fun unserialize(s: InputStream): MerklePath {
+            val count = s.readUByte().toInt()
+            val leftBitsSize = ceil(count / 8.0).toInt()
+            val leftBits = s.readFull(leftBitsSize)
 
+            val nodes = Array(count) { i ->
+                val cell = leftBits[i / 8].toUByte().toInt()
+                val left = (cell and (0x80 shr (i % 8))) != 0
+                val hash = HashLight().apply { unserialize(s) }
+                Node(hash, left)
+            }
+            return MerklePath(nodes.toList())
         }
     }
 

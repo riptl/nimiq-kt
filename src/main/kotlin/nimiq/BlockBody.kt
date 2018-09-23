@@ -75,7 +75,8 @@ class BlockBody(
     val serializedSize: Int get() {
         var size = 25 // Static fields
         size += extraData.size
-        size += transactions.sumBy { it.serializedSize }
+        for (tx in transactions)
+            size += tx.serializedSize
         return size
     }
 

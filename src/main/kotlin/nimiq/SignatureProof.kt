@@ -21,7 +21,8 @@ class SignatureProof(
             if (inStream.available() > 0)
                 return false
 
-            return proof.verify(t.sender, t.serializeContent())
+            return proof.verify(t.sender,
+                assemble { t.serializeContent(it) })
         }
 
         fun singleSig(publicKey: PublicKeyNim, signature: SignatureNim) =
@@ -31,8 +32,8 @@ class SignatureProof(
             SignatureProof(
                 signerKey,
                 MerklePath.compute(
-                    publicKeys.map{it.hash()},
-                    signerKey.hash()),
+                    publicKeys.map{it.hash},
+                    signerKey.hash),
                 signature
             )
 
@@ -51,7 +52,7 @@ class SignatureProof(
         )
 
     fun isSignedBy(sender: Address): Boolean {
-        val merkleRoot = merklePath.computeRoot(publicKey.hash())
+        val merkleRoot = merklePath.computeRoot(publicKey.hash)
         val signerAddr = Address.fromHash(merkleRoot)
         return signerAddr == sender
     }

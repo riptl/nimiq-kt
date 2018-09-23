@@ -1,5 +1,7 @@
 package com.terorie.nimiq
 
+import java.io.InputStream
+
 @ExperimentalUnsignedTypes
 class BasicAccount(balance: Satoshi) : Account() {
 
@@ -16,6 +18,9 @@ class BasicAccount(balance: Satoshi) : Account() {
 
         fun verifyOutgoingTransaction(tx: Transaction): Boolean =
             SignatureProof.verifyTransaction(tx)
+
+        fun unserialize(s: InputStream) =
+            BasicAccount(balance = s.readULong())
     }
 
     override val type: Account.Type

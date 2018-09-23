@@ -60,20 +60,18 @@ abstract class BaseChain(val store: ChainDataStore) : Blockchain() {
 
     fun getNextTarget(block: Block?, next: Block?): BigInteger? {
         var _block = block
-        var _next = next
 
-        var headData: ChainData?
+        var headData: ChainData
         if (block != null) {
-            headData = store.getChainData(block.header.hash)
-            assert(headData != null)
+            headData = store.getChainData(block.header.hash)!!
         } else {
             _block = head
             headData = mainChain
         }
 
-        if (_next != null) {
-            headData = headData!!.nextChainData(_next)
-            _block = _next
+        if (next != null) {
+            headData = headData.nextChainData(next)
+            _block = next
         }
 
         _block!!
@@ -84,30 +82,30 @@ abstract class BaseChain(val store: ChainDataStore) : Blockchain() {
             if (Policy.DIFFICULTY_BLOCK_WINDOW >= _block.header.height) 1U
             else _block.header.height - Policy.DIFFICULTY_BLOCK_WINDOW
 
-        var tailData: ChainData? = null
+        var tailData: ChainData?
         if (headData.onMainChain) {
             tailData = store.getChainDataAt(tailHeight)
         } else {
             var prevData = headData
-            for (i in 0 until Policy.DIFFICULTY_BLOCK_WINDOW) {
+            for (i in 0 until Policy.DIFFICULTY_BLOCK_WINDOW.toInt()) {
                 if (!prevData.onMainChain)
                     break
-                prevData = store.getChainData(prevData.head.prevHash)
+                prevData = store.getChainData(prevData.head.header.prevHash)
                     ?: return null
             }
 
-            tailData = if (prevData.onMainChain && prevData.head.height > tailHeight)
+            tailData = if (prevData.onMainChain && prevData.head.header.height > tailHeight)
                 store.getChainDataAt(tailHeight)
             else
                 prevData
         }
 
-        if (tailData == null || tailData.totalDifficulty < 1)
+        if (tailData == null || tailData.totalDifficulty < BigInteger.ONE)
             // Not enough blocks are available to compute the next target, fail.
             return null
 
-        val deltaTotalDifficulty = headData!!.totalDifficulty - tailData.totalDifficulty
-        return getNextTarget(headData.head.header, tailData.head.header, deltaTotalDifficulty)
+        val deltaTotalDifficulty = headData.totalDifficulty - tailData.totalDifficulty
+        return BlockUtils.getNextTarget(headData.head.header, tailData.head.header, deltaTotalDifficulty)
     }
 
 }

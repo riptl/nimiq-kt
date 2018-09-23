@@ -38,6 +38,9 @@ object BlockUtils {
     fun compactToDifficulty(compact: UInt): BigInteger =
         Policy.BLOCK_TARGET_MAX / compactToTarget(compact)
 
+    fun difficultyToTarget(difficulty: BigInteger): BigInteger =
+        Policy.BLOCK_TARGET_MAX / difficulty
+
     fun targetToDifficulty(target: BigInteger): BigInteger =
         Policy.BLOCK_TARGET_MAX / target
 
@@ -57,5 +60,50 @@ object BlockUtils {
 
     fun powerOfTwo(exp: Int) =
         BigInteger.ONE shl exp
+
+    fun getNextTarget(headBlock: BlockHeader, tailBlock: BlockHeader, deltaTotalDifficulty: BigInteger): BigInteger {
+        var deltaTotalDiff = deltaTotalDifficulty
+
+        assert(
+            headBlock.height - tailBlock.height == Policy.DIFFICULTY_BLOCK_WINDOW
+                ||
+            headBlock.height <= Policy.DIFFICULTY_BLOCK_WINDOW && tailBlock.height == 1U
+        ) { "Tail and head block must be ${Policy.DIFFICULTY_BLOCK_WINDOW} blocks apart"}
+
+        var actualTime = headBlock.timestamp - tailBlock.timestamp
+
+        // Simulate that the Policy.BLOCK_TIME was achieved for the blocks before the genesis block, i.e. we simulate
+        // a sliding window that starts before the genesis block. Assume difficulty = 1 for these blocks.
+        if (headBlock.height <= Policy.DIFFICULTY_BLOCK_WINDOW) {
+            actualTime += (Policy.DIFFICULTY_BLOCK_WINDOW - headBlock.height + 1) * Policy.BLOCK_TIME
+            deltaTotalDiff += BigInteger.valueOf(
+                (Policy.DIFFICULTY_BLOCK_WINDOW - headBlock.height + 1).toLong())
+        }
+
+        // Compute the target adjustment factor.
+        val expectedTime = Policy.DIFFICULTY_BLOCK_WINDOW * Policy.BLOCK_TIME
+        var adjustment = actualTime.toInt().toDouble() / expectedTime.toInt()
+
+        // Clamp the adjustment factor to [1 / MAX_ADJUSTMENT_FACTOR, MAX_ADJUSTMENT_FACTOR].
+        adjustment = max(adjustment, 1.0 / Policy.DIFFICULTY_MAX_ADJUSTMENT_FACTOR)
+        adjustment = min(adjustment, Policy.DIFFICULTY_MAX_ADJUSTMENT_FACTOR)
+
+        // Compute the next target.
+        val averageDifficulty = deltaTotalDifficulty / BigInteger.valueOf(Policy.DIFFICULTY_BLOCK_WINDOW.toLong())
+        val averageTarget = difficultyToTarget(averageDifficulty)
+        var nextTarget = (averageTarget.toBigDecimal() * adjustment.toBigDecimal()).toBigInteger()
+
+        // Make sure the target is below or equal the maximum allowed target (difficulty 1).
+        // Also enforce a minimum target of 1.
+        if (nextTarget > Policy.BLOCK_TARGET_MAX)
+            nextTarget = Policy.BLOCK_TARGET_MAX
+
+        if (nextTarget < BigInteger.ONE)
+            nextTarget = BigInteger.ONE
+
+        // XXX Reduce target precision to nBits precision.
+        val nBits = targetToCompact(nextTarget)
+        return compactToTarget(nBits)
+    }
 
 }

@@ -12,6 +12,10 @@ class ChainDataStore {
         return null
     }
 
+    fun getChainDataAt(height: UInt, includeBody: Boolean = false): ChainData? {
+        return null
+    }
+
     fun getBlockAt(height: UInt, includeBody: Boolean = false): Block? {
         return null
     }

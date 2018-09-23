@@ -60,7 +60,7 @@ class BasicTransaction(
         signature.serialize(s)
     }
 
-    override val serializedSize get() = 138U
+    override val serializedSize get() = 138
 
     override val format: Format
         get() = Transaction.Format.BASIC

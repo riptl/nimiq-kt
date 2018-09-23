@@ -119,7 +119,7 @@ class Block(
             return false
 
         // Check that the interlink is correct.
-        val interlink = predecessor.getNextInterlink(header.target, version)
+        val interlink = predecessor.getNextInterlink(header.target, header.version)
         if (this.interlink != interlink)
             return false
 
@@ -217,7 +217,7 @@ class Block(
         isImmediateSuccessorOf(predecessor) ||
         isInterlinkSuccessorOf(predecessor)
 
-    fun getNextInterlink(nextTarget: BigInteger, nextVersion: BlockHeader.VERSION): BlockInterlink {
+    fun getNextInterlink(nextTarget: BigInteger, nextVersion: UShort = BlockHeader.VERSION): BlockInterlink {
         val hashes = ArrayList<HashLight>()
 
         // Compute how many times this blockHash should be included in the next interlink.

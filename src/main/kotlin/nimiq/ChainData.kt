@@ -1,5 +1,6 @@
 package com.terorie.nimiq
 
+import com.terorie.nimiq.BlockUtils.getHashDepth
 import com.terorie.nimiq.BlockUtils.realDifficulty
 import java.math.BigInteger
 
@@ -9,8 +10,8 @@ class ChainData(
     val totalDifficulty: BigInteger,
     val totalWork: BigInteger,
     val superBlockCounts: SuperBlockCounts,
-    val onMainChain: Boolean?,
-    val mainChainSuccessor: HashLight
+    val onMainChain: Boolean = false,
+    val mainChainSuccessor: HashLight? = null
 ) {
 
     fun nextChainData(block: Block): ChainData {
@@ -25,7 +26,7 @@ class ChainData(
 
         fun add(depth: UByte) {
             for (i in 0 until depth.toInt())
-                list[i] = (list.getOrNull(i) ?: 0) + 1
+                list[i] = ((list.getOrNull(i)?.toUInt() ?: 0U) + 1U).toUByte()
         }
 
         fun subtract(depth: UByte) {

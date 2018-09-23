@@ -20,7 +20,7 @@ class BlockHeader(
 ) {
 
     companion object {
-        const val VERSION = 1
+        const val VERSION: UShort = 1U
         val SUPPORTED_VERSIONS = arrayOf(1)
         const val SERIALIZED_SIZE = 146
 

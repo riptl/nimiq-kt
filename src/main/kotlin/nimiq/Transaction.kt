@@ -42,7 +42,7 @@ abstract class Transaction(
     abstract val format: Format
 
     abstract fun serialize(s: OutputStream)
-    abstract val serializedSize: UInt
+    abstract val serializedSize: Int
 
     var _valid: Boolean? = null
     fun verify(networkId: UByte = GenesisConfig.networkID): Boolean {
@@ -86,8 +86,8 @@ abstract class Transaction(
     }
 
     override fun compareTo(other: Transaction) = when {
-        fee / serializedSize > other.fee / other.serializedSize -> -1
-        fee / serializedSize < other.fee / other.serializedSize -> +1
+        fee / serializedSize.toUInt() > other.fee / other.serializedSize.toUInt() -> -1
+        fee / serializedSize.toUInt() < other.fee / other.serializedSize.toUInt() -> +1
         serializedSize > other.serializedSize -> -1
         serializedSize < other.serializedSize -> +1
         fee > other.fee -> -1
