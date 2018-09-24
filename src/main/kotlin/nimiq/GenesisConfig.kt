@@ -62,10 +62,10 @@ object GenesisConfig {
                 bodyHash = HashLight.fromBase64("fNqaf98GZVkFrl29nFNUUUcbB4+m898OKH5bD7R6Vzo="),
                 accountsHash = HashLight.fromBase64("H+/UTx+pcYX9oh6VdUXJfcdkP6fk792G4KpCRNHgvFw="),
                 nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
-                height = 1,
+                height = 1U,
                 timestamp = 1523727000U,
-                nonce = 137689,
-                version = 1
+                nonce = 137689U,
+                version = 1U
             ),
             BlockInterlink(
                 hashes = arrayListOf(),
@@ -101,10 +101,10 @@ object GenesisConfig {
                 bodyHash = HashLight.fromBase64("9rorv34UeKIJBXAARx1z+9wo3wtxd0fZKc/egpxBIPY="),
                 accountsHash = HashLight.fromBase64("LgLaPRYuIPqYICnb3pzCD2tDGrBd8XZPNK9MYqTysz8="),
                 nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
-                height = 1,
+                height = 1U,
                 timestamp = 1522735199U,
-                nonce = 79001,
-                version = 1
+                nonce = 79001U,
+                version = 1U
             ),
             BlockInterlink(
                 hashes = arrayListOf(),
@@ -135,10 +135,10 @@ object GenesisConfig {
                 bodyHash = HashLight.fromBase64("JvMr9c9l2m8HWNdFAGTEastKH+aDZvln9EopXelhVIg="),
                 accountsHash = HashLight.fromBase64("1t/Zm91tN0p178+ePcxyR5bPxvC6jFLskqiidFFO3wY="),
                 nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
-                height = 1,
-                timestamp = 1522338300,
-                nonce = 12432,
-                version = 1
+                height = 1U,
+                timestamp = 1522338300U,
+                nonce = 12432U,
+                version = 1U
             ),
             BlockInterlink(
                 hashes = arrayListOf(),
@@ -173,10 +173,10 @@ object GenesisConfig {
                 bodyHash = HashLight.fromBase64("nPcJa/7i0KYsiPQ8FPOgvLYgpP3m05UMwPfIPJAdAvI="),
                 accountsHash = HashLight.fromBase64("sXZsIZDV40vD7NDdrnSk2tOsPMKKit/vH0xvz1RXmQo="),
                 nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
-                height = 1,
+                height = 1U,
                 timestamp = 1522338300U,
-                nonce = 67058,
-                version = 1
+                nonce = 67058U,
+                version = 1U
             ),
             BlockInterlink(
                 hashes = arrayListOf(),

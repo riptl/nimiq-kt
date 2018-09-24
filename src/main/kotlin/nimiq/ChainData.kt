@@ -32,7 +32,7 @@ class ChainData(
         fun subtract(depth: UByte) {
             for (i in 0 until depth.toInt()) {
                 list[i]--
-                assert(list[i] >= 0)
+                assert(list[i] >= 0.toUByte())
             }
         }
 

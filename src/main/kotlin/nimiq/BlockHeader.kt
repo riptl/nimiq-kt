@@ -92,7 +92,7 @@ class BlockHeader(
 
     fun isImmediateSuccessorOf(prevHeader: BlockHeader): Boolean {
         // Check that the height is one higher than the previous height.
-        if (height != prevHeader.height + 1)
+        if (height != prevHeader.height + 1U)
             return false
 
         // Check that the timestamp is greater or equal to the predecessor's timestamp.

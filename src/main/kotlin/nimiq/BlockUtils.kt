@@ -7,7 +7,7 @@ import kotlin.math.*
 object BlockUtils {
 
     fun compactToTarget(compact: UInt): BigInteger {
-        val exp = 8 * ((compact shr 24) - 3).toInt()
+        val exp = 8 * ((compact shr 24) - 3U).toInt()
         val base = BigInteger.ONE shl exp
         val factor = BigInteger.valueOf(compact.toLong() and 0xffffff)
         return base * factor
@@ -26,7 +26,7 @@ object BlockUtils {
         val followBytesBig = target / BigInteger.valueOf(followMask.toLong())
         val followBytes = followBytesBig.toInt().toUInt()
 
-        return (size.toUInt() shl 24) or (followBytes and 0xffffff)
+        return (size.toUInt() shl 24) or (followBytes and 0xffffffU)
     }
 
     fun getTargetHeight(target: BigInteger): Int =
@@ -78,9 +78,9 @@ object BlockUtils {
         // Simulate that the Policy.BLOCK_TIME was achieved for the blocks before the genesis block, i.e. we simulate
         // a sliding window that starts before the genesis block. Assume difficulty = 1 for these blocks.
         if (headBlock.height <= Policy.DIFFICULTY_BLOCK_WINDOW) {
-            actualTime += (Policy.DIFFICULTY_BLOCK_WINDOW - headBlock.height + 1) * Policy.BLOCK_TIME
+            actualTime += (Policy.DIFFICULTY_BLOCK_WINDOW - headBlock.height + 1U) * Policy.BLOCK_TIME
             deltaTotalDiff += BigInteger.valueOf(
-                (Policy.DIFFICULTY_BLOCK_WINDOW - headBlock.height + 1).toLong())
+                (Policy.DIFFICULTY_BLOCK_WINDOW - headBlock.height + 1U).toLong())
         }
 
         // Compute the target adjustment factor.

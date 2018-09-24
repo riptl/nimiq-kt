@@ -39,12 +39,12 @@ abstract class BaseChain(val store: ChainDataStore) : Blockchain() {
         }
 
         var step = 2U
-        var i = height - 10 - step
-        while (i > 0) {
+        var i = height - 10U - step
+        while (i > 0U) {
             block = getBlockAt(i)
             if (block != null)
                 locators.add(block.header.hash)
-            step *= 2
+            step *= 2U
             // TODO Respect max size for GetBlocksMessages
             i -= step
         }

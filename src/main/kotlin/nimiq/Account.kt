@@ -19,7 +19,7 @@ abstract class Account : Serializable {
     }
 
     companion object {
-        val INITIAL = BasicAccount(0)
+        val INITIAL = BasicAccount(0UL)
 
         fun verifyIncomingTransaction(type: Type, tx: Transaction) = when(type) {
             Type.BASIC -> BasicAccount.verifyIncomingTransaction(tx)

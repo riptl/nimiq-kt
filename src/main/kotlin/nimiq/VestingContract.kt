@@ -110,7 +110,7 @@ class VestingContract(
     }
 
     fun getMinCap(blockHeight: UInt): ULong =
-        if (vestingStepBlocks != 0U && vestingStepAmount > 0) {
+        if (vestingStepBlocks != 0U && vestingStepAmount > 0U) {
             val amount = vestingTotalAmount - ((blockHeight - vestingStart) / vestingStepBlocks) * vestingStepAmount
             if (amount > vestingTotalAmount) 0U
             else vestingTotalAmount - amount

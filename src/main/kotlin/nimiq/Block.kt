@@ -59,7 +59,7 @@ class Block(
 
     fun verify(time: Date): Boolean {
         // Check that the timestamp is not too far into the future.
-        if (header.timestamp * 1000 > TODO()) {
+        if (header.timestamp * 1000U > TODO()) {
             return false
         }
 
@@ -161,7 +161,7 @@ class Block(
         // - that the height of the successor is one higher
         // - that the interlink is correct.
         if (header.prevHash == prevHash) {
-            if (header.height != predecessor.header.height + 1) {
+            if (header.height != predecessor.header.height + 1U) {
                 return false
             }
 
@@ -172,7 +172,7 @@ class Block(
         }
         // Otherwise, if the prevHash doesn't match but the blocks should be adjacent according to their height fields,
         // this cannot be a valid successor of predecessor.
-        else if (header.height == predecessor.header.height + 1) {
+        else if (header.height == predecessor.header.height + 1U) {
             return false
         }
         // Otherwise, check that the interlink construction is valid given the information we have.

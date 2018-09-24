@@ -18,6 +18,14 @@ data class PrunedAccount(val address: Address, val account: Account): Comparable
         account.serialize(s)
     }
 
+    var _hash: HashLight? = null
+    val hash: HashLight
+        get() {
+            if (_hash == null)
+                _hash = HashLight(assemble { serialize(it) })
+            return _hash!!
+        }
+
     override fun compareTo(other: PrunedAccount) =
         address.compareTo(other.address)
 

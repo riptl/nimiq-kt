@@ -56,10 +56,10 @@ fun InputStream.readUInt(): UInt {
 
 @ExperimentalUnsignedTypes
 fun OutputStream.writeUInt(x: UInt) {
-    write(((x       ) and 0xFF).toInt())
-    write(((x shr  8) and 0xFF).toInt())
-    write(((x shr 16) and 0xFF).toInt())
-    write(((x shr 24) and 0xFF).toInt())
+    write(((x       ) and 0xFFU).toInt())
+    write(((x shr  8) and 0xFFU).toInt())
+    write(((x shr 16) and 0xFFU).toInt())
+    write(((x shr 24) and 0xFFU).toInt())
 }
 
 @ExperimentalUnsignedTypes

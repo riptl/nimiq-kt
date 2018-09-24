@@ -36,7 +36,7 @@ abstract class Transaction(
     }
 
     enum class Format(val id: UByte) {
-        BASIC(0), EXTENDED(1)
+        BASIC(0U), EXTENDED(1U)
     }
 
     abstract val format: Format
