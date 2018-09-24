@@ -9,6 +9,7 @@ open class PeerAddress(
     val timestamp: UInt,
     val netAddress: InetSocketAddress,
     val publicKey: PublicKeyNim?,
+    var distance: Int,
     val signature: SignatureNim?
 )
 
@@ -19,11 +20,11 @@ open class WsBasePeerAddress(
     timestamp: UInt,
     netAddress: InetSocketAddress,
     publicKey: PublicKeyNim?,
-    val distance: Int,
+    distance: Int,
     val host: String,
     val port: Int,
     signature: SignatureNim?
-) : PeerAddress(protocol, services, timestamp, netAddress, publicKey, signature) {
+) : PeerAddress(protocol, services, timestamp, netAddress, publicKey, distance, signature) {
 
     companion object {
         fun seed(protocol: Protocol, host: String, port: Int, pubKeyHex: String?): WsBasePeerAddress {
