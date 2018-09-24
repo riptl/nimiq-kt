@@ -1,4 +1,4 @@
+
 **nimiq-kt**
 
-Parts of Nimiq core in Kotlin
-Don't use (yet), experimental :P
+WIP Rewrite of https://github.com/nimiq-network/core
