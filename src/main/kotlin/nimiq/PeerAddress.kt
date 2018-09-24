@@ -23,7 +23,50 @@ open class WsBasePeerAddress(
     val host: String,
     val port: Int,
     signature: SignatureNim?
-) : PeerAddress(protocol, services, timestamp, netAddress, publicKey, signature)
+) : PeerAddress(protocol, services, timestamp, netAddress, publicKey, signature) {
+
+    companion object {
+        fun seed(protocol: Protocol, host: String, port: Int, pubKeyHex: String?): WsBasePeerAddress {
+            val pubKey: PublicKeyNim? =
+                if (pubKeyHex != null)
+                    PublicKeyNim.fromHex(pubKeyHex)
+                else null
+
+            return when (protocol) {
+                Protocol.WSS -> WssPeerAddress(
+                    services = Services.FULL,
+                    timestamp = 0U,
+                    netAddress = InetSocketAddress(host, port),
+                    publicKey = pubKey,
+                    distance = 0,
+                    host = host, port = port
+                )
+                Protocol.WS -> WsPeerAddress(
+                    services = Services.FULL,
+                    timestamp = 0U,
+                    netAddress = InetSocketAddress(host, port),
+                    publicKey = pubKey,
+                    distance = 0,
+                    host = host, port = port
+                )
+                else -> throw IllegalArgumentException("not a WebSockets peer")
+            }
+        }
+    }
+
+}
+
+@ExperimentalUnsignedTypes
+class WsPeerAddress(
+    services: UInt,
+    timestamp: UInt,
+    netAddress: InetSocketAddress,
+    publicKey: PublicKeyNim?,
+    distance: Int,
+    host: String,
+    port: Int,
+    signature: SignatureNim? = null
+) : WsBasePeerAddress(Protocol.WS, services, timestamp, netAddress, publicKey, distance, host, port, signature)
 
 @ExperimentalUnsignedTypes
 class WssPeerAddress(
@@ -35,23 +78,4 @@ class WssPeerAddress(
     host: String,
     port: Int,
     signature: SignatureNim? = null
-) : WsBasePeerAddress(Protocol.WSS, services, timestamp, netAddress, publicKey, distance, host, port, signature) {
-
-    companion object {
-        fun seed(host: String, port: Int, pubKeyHex: String?): WssPeerAddress {
-            val pubKey: PublicKeyNim? =
-                if (pubKeyHex != null)
-                    PublicKeyNim.fromHex(pubKeyHex)
-                else null
-            return WssPeerAddress(
-                services = Services.FULL,
-                timestamp = 0U,
-                netAddress = InetSocketAddress(host, port),
-                publicKey = pubKey,
-                distance = 0,
-                host = host, port = port
-            )
-        }
-    }
-
-}
+) : WsBasePeerAddress(Protocol.WSS, services, timestamp, netAddress, publicKey, distance, host, port, signature)
