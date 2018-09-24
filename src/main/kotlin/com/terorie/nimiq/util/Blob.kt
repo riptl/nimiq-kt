@@ -1,6 +1,7 @@
 package com.terorie.nimiq.util
 
 import com.terorie.nimiq.consensus.primitive.HashLight
+import com.terorie.nimiq.util.io.*
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
@@ -38,6 +39,8 @@ open class Blob: Comparable<Blob> {
         if (other is Blob)
             Arrays.equals(buf, other.buf)
         else false
+
+    override fun hashCode() = buf.hashCode()
 
     override fun compareTo(other: Blob): Int {
         val sizeCompare = size.compareTo(other.size)

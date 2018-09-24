@@ -1,8 +1,8 @@
 package com.terorie.nimiq.consensus.account
 
+import com.terorie.nimiq.consensus.primitive.HashLight
 import com.terorie.nimiq.util.Base32
 import com.terorie.nimiq.util.Blob
-import com.terorie.nimiq.consensus.primitive.HashLight
 import java.util.*
 import kotlin.math.ceil
 

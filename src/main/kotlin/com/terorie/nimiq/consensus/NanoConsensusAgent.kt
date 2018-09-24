@@ -1,7 +1,7 @@
 package com.terorie.nimiq.consensus
 
-import com.terorie.nimiq.network.Peer
 import com.terorie.nimiq.consensus.block.BlockHeader
+import com.terorie.nimiq.network.Peer
 
 @ExperimentalUnsignedTypes
 class NanoConsensusAgent(
@@ -40,8 +40,8 @@ class NanoConsensusAgent(
         // Request the peer's mempool.
         // XXX Use a random delay here to prevent requests to multiple peers at once.
         val delay = MEMPOOL_DELAY_MIN
-                + Math.random() * (MEMPOOL_DELAY_MAX - MEMPOOL_DELAY_MIN);
-        // TODO setTimeout(() => this._peer.channel.mempool(), delay);
+                + Math.random() * (MEMPOOL_DELAY_MAX - MEMPOOL_DELAY_MIN)
+        // TODO setTimeout(() => this._peer.channel.mempool(), delay)
     }
 
     private fun syncFinished() {

@@ -5,8 +5,7 @@ import com.terorie.nimiq.consensus.Policy
 import com.terorie.nimiq.consensus.block.BlockUtils.getHashDepth
 import com.terorie.nimiq.consensus.block.BlockUtils.getTargetDepth
 import com.terorie.nimiq.consensus.primitive.HashLight
-import com.terorie.nimiq.util.readUByte
-import com.terorie.nimiq.util.writeUByte
+import com.terorie.nimiq.util.io.*
 import java.io.InputStream
 import java.io.OutputStream
 import java.math.BigInteger

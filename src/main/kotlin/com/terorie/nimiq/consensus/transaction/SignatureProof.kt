@@ -1,10 +1,10 @@
 package com.terorie.nimiq.consensus.transaction
 
-import com.terorie.nimiq.util.MerklePath
+import com.terorie.nimiq.consensus.account.Address
 import com.terorie.nimiq.consensus.primitive.PublicKeyNim
 import com.terorie.nimiq.consensus.primitive.SignatureNim
-import com.terorie.nimiq.util.assemble
-import com.terorie.nimiq.consensus.account.Address
+import com.terorie.nimiq.util.MerklePath
+import com.terorie.nimiq.util.io.*
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.OutputStream

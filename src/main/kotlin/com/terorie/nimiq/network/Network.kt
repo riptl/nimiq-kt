@@ -1,11 +1,12 @@
 package com.terorie.nimiq.network
 
-import com.terorie.nimiq.network.connection.ConnectionPool
+import com.terorie.nimiq.consensus.blockchain.IBlockchain
 import com.terorie.nimiq.network.address.PeerAddressBook
+import com.terorie.nimiq.network.connection.ConnectionPool
 
 @ExperimentalUnsignedTypes
 class Network(
-        val blockchain: Blockchain,
+        val blockchain: IBlockchain,
         val networkConfig: NetworkConfig,
         val time: UInt
 ) {

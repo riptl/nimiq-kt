@@ -59,4 +59,10 @@ class Hash(val algorithm: Algorithm) : Blob(algorithm.size) {
             super.equals(other)
         else false
 
+    override fun hashCode(): Int =
+        (buf[0].toInt() shl 24) or
+        (buf[1].toInt() shl 16) or
+        (buf[2].toInt() shl  8) or
+        (buf[3].toInt())
+
 }

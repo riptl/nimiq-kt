@@ -9,7 +9,7 @@ import java.math.BigInteger
 import kotlin.math.min
 
 @ExperimentalUnsignedTypes
-abstract class BaseChain(val store: ChainDataStore) : Blockchain() {
+abstract class BaseChain(val store: ChainDataStore) : IBlockchain {
 
     abstract val mainChain: ChainData
 
@@ -87,7 +87,7 @@ abstract class BaseChain(val store: ChainDataStore) : Blockchain() {
             if (Policy.DIFFICULTY_BLOCK_WINDOW >= _block.header.height) 1U
             else _block.header.height - Policy.DIFFICULTY_BLOCK_WINDOW
 
-        var tailData: ChainData?
+        val tailData: ChainData?
         if (headData.onMainChain) {
             tailData = store.getChainDataAt(tailHeight)
         } else {

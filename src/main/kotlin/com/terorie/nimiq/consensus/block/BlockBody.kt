@@ -4,7 +4,8 @@ import com.terorie.nimiq.consensus.account.Address
 import com.terorie.nimiq.consensus.account.PrunedAccount
 import com.terorie.nimiq.consensus.primitive.HashLight
 import com.terorie.nimiq.consensus.transaction.Transaction
-import com.terorie.nimiq.util.*
+import com.terorie.nimiq.util.MerkleTree
+import com.terorie.nimiq.util.io.*
 import java.io.InputStream
 import java.io.OutputStream
 

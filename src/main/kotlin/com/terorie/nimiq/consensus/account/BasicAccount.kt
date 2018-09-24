@@ -3,7 +3,7 @@ package com.terorie.nimiq.consensus.account
 import com.terorie.nimiq.consensus.primitive.Satoshi
 import com.terorie.nimiq.consensus.transaction.SignatureProof
 import com.terorie.nimiq.consensus.transaction.Transaction
-import com.terorie.nimiq.util.readULong
+import com.terorie.nimiq.util.io.*
 import java.io.InputStream
 
 @ExperimentalUnsignedTypes

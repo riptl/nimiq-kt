@@ -3,7 +3,7 @@ package com.terorie.nimiq.consensus.transaction
 import com.terorie.nimiq.consensus.account.Account
 import com.terorie.nimiq.consensus.account.Address
 import com.terorie.nimiq.consensus.primitive.Satoshi
-import com.terorie.nimiq.util.*
+import com.terorie.nimiq.util.io.*
 import java.io.InputStream
 import java.io.OutputStream
 

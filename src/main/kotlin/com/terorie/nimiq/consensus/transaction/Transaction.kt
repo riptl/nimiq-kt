@@ -5,8 +5,7 @@ import com.terorie.nimiq.consensus.account.Account
 import com.terorie.nimiq.consensus.account.Address
 import com.terorie.nimiq.consensus.primitive.HashLight
 import com.terorie.nimiq.consensus.primitive.Satoshi
-import com.terorie.nimiq.util.assemble
-import com.terorie.nimiq.util.readUByte
+import com.terorie.nimiq.util.io.*
 import org.bouncycastle.util.Arrays
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -77,6 +76,8 @@ abstract class Transaction(
                 _hash = HashLight(assemble { serializeContent(it) })
             return _hash!!
         }
+
+    val feePerByte get() = fee / serializedSize.toULong()
 
     open fun getContactCreationAddress(): Address {
         // TODO Efficiency

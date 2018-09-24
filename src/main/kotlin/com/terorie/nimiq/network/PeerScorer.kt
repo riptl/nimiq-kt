@@ -1,7 +1,7 @@
 package com.terorie.nimiq.network
 
-import com.terorie.nimiq.network.connection.ConnectionPool
 import com.terorie.nimiq.network.address.PeerAddressBook
+import com.terorie.nimiq.network.connection.ConnectionPool
 
 @ExperimentalUnsignedTypes
 class PeerScorer(

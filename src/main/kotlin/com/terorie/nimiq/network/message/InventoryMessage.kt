@@ -4,7 +4,7 @@ import com.terorie.nimiq.consensus.block.Block
 import com.terorie.nimiq.consensus.block.BlockHeader
 import com.terorie.nimiq.consensus.primitive.HashLight
 import com.terorie.nimiq.consensus.transaction.Transaction
-import com.terorie.nimiq.util.writeUInt
+import com.terorie.nimiq.util.io.*
 import java.io.OutputStream
 
 @ExperimentalUnsignedTypes

@@ -1,9 +1,9 @@
 package com.terorie.nimiq.network.address
 
 import com.terorie.nimiq.consensus.primitive.PublicKeyNim
-import com.terorie.nimiq.util.Services
 import com.terorie.nimiq.consensus.primitive.SignatureNim
 import com.terorie.nimiq.network.Protocol
+import com.terorie.nimiq.util.Services
 import java.net.InetSocketAddress
 
 @ExperimentalUnsignedTypes

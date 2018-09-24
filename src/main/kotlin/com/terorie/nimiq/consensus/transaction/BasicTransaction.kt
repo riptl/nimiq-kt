@@ -6,9 +6,7 @@ import com.terorie.nimiq.consensus.primitive.HashLight
 import com.terorie.nimiq.consensus.primitive.PublicKeyNim
 import com.terorie.nimiq.consensus.primitive.Satoshi
 import com.terorie.nimiq.consensus.primitive.SignatureNim
-import com.terorie.nimiq.util.readUByte
-import com.terorie.nimiq.util.readUInt
-import com.terorie.nimiq.util.readULong
+import com.terorie.nimiq.util.io.*
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream

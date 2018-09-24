@@ -1,7 +1,7 @@
 package com.terorie.nimiq.consensus.account
 
-import com.terorie.nimiq.util.assemble
 import com.terorie.nimiq.consensus.primitive.HashLight
+import com.terorie.nimiq.util.io.*
 import java.io.InputStream
 import java.io.OutputStream
 

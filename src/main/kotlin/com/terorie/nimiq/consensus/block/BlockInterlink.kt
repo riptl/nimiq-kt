@@ -3,8 +3,7 @@ package com.terorie.nimiq.consensus.block
 import com.terorie.nimiq.consensus.GenesisConfig
 import com.terorie.nimiq.consensus.primitive.HashLight
 import com.terorie.nimiq.util.MerkleTree
-import com.terorie.nimiq.util.readFull
-import com.terorie.nimiq.util.readUByte
+import com.terorie.nimiq.util.io.*
 import java.io.InputStream
 import java.io.OutputStream
 import kotlin.experimental.or

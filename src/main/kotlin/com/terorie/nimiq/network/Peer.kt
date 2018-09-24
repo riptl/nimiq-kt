@@ -1,7 +1,7 @@
 package com.terorie.nimiq.network
 
-import com.terorie.nimiq.network.connection.PeerChannel
 import com.terorie.nimiq.consensus.primitive.HashLight
+import com.terorie.nimiq.network.connection.PeerChannel
 
 class Peer(
         val channel: PeerChannel,

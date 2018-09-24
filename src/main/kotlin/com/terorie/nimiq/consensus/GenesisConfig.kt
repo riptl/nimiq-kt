@@ -1,12 +1,12 @@
 package com.terorie.nimiq.consensus
 
-import com.terorie.nimiq.consensus.primitive.PublicKeyNim
-import com.terorie.nimiq.network.address.SeedListURL
 import com.terorie.nimiq.consensus.account.Address
 import com.terorie.nimiq.consensus.block.*
 import com.terorie.nimiq.consensus.primitive.HashLight
+import com.terorie.nimiq.consensus.primitive.PublicKeyNim
 import com.terorie.nimiq.network.Protocol
 import com.terorie.nimiq.network.address.PeerAddress
+import com.terorie.nimiq.network.address.SeedListURL
 import com.terorie.nimiq.network.address.WsBasePeerAddress
 import org.bouncycastle.util.encoders.Base64
 import java.math.BigInteger

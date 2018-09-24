@@ -1,6 +1,7 @@
 package com.terorie.nimiq.consensus
 
 import com.terorie.nimiq.consensus.blockchain.BaseChain
+import com.terorie.nimiq.consensus.mempool.Mempool
 import com.terorie.nimiq.network.Network
 import com.terorie.nimiq.network.Peer
 import com.terorie.nimiq.util.Services

@@ -1,7 +1,6 @@
 package com.terorie.nimiq.network.connection
 
 import com.terorie.nimiq.network.address.PeerAddressBook
-import com.terorie.nimiq.network.connection.PeerChannel
 
 @ExperimentalUnsignedTypes
 class SignalRoute(

@@ -1,12 +1,8 @@
 package com.terorie.nimiq.consensus.block
 
-import com.terorie.nimiq.consensus.block.BlockUtils.compactToDifficulty
-import com.terorie.nimiq.consensus.block.BlockUtils.compactToTarget
 import com.terorie.nimiq.consensus.primitive.HashHard
 import com.terorie.nimiq.consensus.primitive.HashLight
-import com.terorie.nimiq.util.assemble
-import com.terorie.nimiq.util.readUInt
-import com.terorie.nimiq.util.readUShort
+import com.terorie.nimiq.util.io.*
 import java.io.InputStream
 import java.io.OutputStream
 import java.math.BigInteger
@@ -54,10 +50,10 @@ class BlockHeader(
     }
 
     val target: BigInteger
-        get() = compactToTarget(nBits)
+        get() = BlockUtils.compactToTarget(nBits)
 
     val difficulty: BigInteger
-        get() = compactToDifficulty(nBits)
+        get() = BlockUtils.compactToDifficulty(nBits)
 
     var _hash: HashLight? = null
     val hash: HashLight
@@ -104,7 +100,7 @@ class BlockHeader(
         if (timestamp < prevHeader.timestamp)
             return false
 
-        // Check that the hahs of the predecessor block equals prevHash.
+        // Check that the hash of the predecessor block equals prevHash.
         if (prevHash != prevHeader.hash)
             return false
 

@@ -4,9 +4,7 @@ import com.terorie.nimiq.consensus.account.Address
 import com.terorie.nimiq.consensus.block.Block
 import com.terorie.nimiq.consensus.primitive.Satoshi
 import com.terorie.nimiq.consensus.transaction.Transaction
-import com.terorie.nimiq.util.writeUByte
-import com.terorie.nimiq.util.writeULong
-import com.terorie.nimiq.util.writeUShort
+import com.terorie.nimiq.util.io.*
 import java.io.OutputStream
 
 @ExperimentalUnsignedTypes

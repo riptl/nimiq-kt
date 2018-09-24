@@ -1,6 +1,7 @@
 package com.terorie.nimiq.util
 
 import com.terorie.nimiq.consensus.primitive.HashLight
+import com.terorie.nimiq.util.io.*
 import org.bouncycastle.util.Arrays
 import java.io.InputStream
 import java.io.OutputStream

@@ -1,7 +1,7 @@
 package com.terorie.nimiq.consensus.blockchain
 
 import com.terorie.nimiq.consensus.block.BlockHeader
-import com.terorie.nimiq.util.writeUShort
+import com.terorie.nimiq.util.io.*
 import java.io.OutputStream
 import java.math.BigInteger
 

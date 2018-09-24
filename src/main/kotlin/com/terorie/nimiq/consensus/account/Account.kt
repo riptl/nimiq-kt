@@ -4,7 +4,7 @@ import com.terorie.nimiq.consensus.Policy
 import com.terorie.nimiq.consensus.primitive.Satoshi
 import com.terorie.nimiq.consensus.transaction.Transaction
 import com.terorie.nimiq.consensus.transaction.TransactionCache
-import com.terorie.nimiq.util.readUByte
+import com.terorie.nimiq.util.io.*
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.Serializable

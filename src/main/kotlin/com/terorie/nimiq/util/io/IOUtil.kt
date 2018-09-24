@@ -1,6 +1,9 @@
-package com.terorie.nimiq.util
+package com.terorie.nimiq.util.io
 
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.EOFException
+import java.io.InputStream
+import java.io.OutputStream
 
 fun InputStream.readFull(n: Int) =
     ByteArray(n).apply { readFull(this) }

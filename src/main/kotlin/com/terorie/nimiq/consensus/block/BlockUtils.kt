@@ -1,10 +1,13 @@
 package com.terorie.nimiq.consensus.block
 
+import com.terorie.nimiq.consensus.Policy
 import com.terorie.nimiq.consensus.primitive.Hash
 import com.terorie.nimiq.consensus.primitive.HashHard
-import com.terorie.nimiq.consensus.Policy
 import java.math.BigInteger
-import kotlin.math.*
+import kotlin.math.ceil
+import kotlin.math.log2
+import kotlin.math.max
+import kotlin.math.min
 
 @ExperimentalUnsignedTypes
 object BlockUtils {
