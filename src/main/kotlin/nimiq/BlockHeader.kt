@@ -8,7 +8,6 @@ import java.math.BigInteger
 
 @ExperimentalUnsignedTypes
 class BlockHeader(
-    val version: UShort,
     val prevHash: HashLight,
     val interlinkHash: HashLight,
     val bodyHash: HashLight,
@@ -16,7 +15,8 @@ class BlockHeader(
     val nBits: UInt,
     val height: UInt,
     val timestamp: UInt,
-    nonce: UInt
+    nonce: UInt,
+    val version: UShort
 ) {
 
     companion object {
@@ -25,15 +25,15 @@ class BlockHeader(
         const val SERIALIZED_SIZE = 146
 
         fun unserialize(s: InputStream) = BlockHeader (
-            version = s.readUShort(),
-            prevHash = HashLight().apply { unserialize(s) },
-            interlinkHash = HashLight().apply { unserialize(s) },
-            bodyHash = HashLight().apply { unserialize(s) },
-            accountsHash = HashLight().apply { unserialize(s) },
-            nBits = s.readUInt(),
-            height = s.readUInt(),
-            timestamp = s.readUInt(),
-            nonce = s.readUInt()
+                prevHash = HashLight().apply { unserialize(s) },
+                interlinkHash = HashLight().apply { unserialize(s) },
+                bodyHash = HashLight().apply { unserialize(s) },
+                accountsHash = HashLight().apply { unserialize(s) },
+                nBits = s.readUInt(),
+                height = s.readUInt(),
+                timestamp = s.readUInt(),
+                nonce = s.readUInt(),
+                version = s.readUShort()
         )
     }
 

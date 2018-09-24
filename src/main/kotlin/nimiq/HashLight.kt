@@ -1,11 +1,15 @@
 package com.terorie.nimiq
 
 import org.bouncycastle.crypto.digests.Blake2bDigest
+import org.bouncycastle.util.encoders.Base64
 
 class HashLight() : Blob(SIZE) {
 
     companion object {
         const val SIZE = 32
+
+        fun fromBase64(b64: String) =
+            HashLight().apply { copyFrom(Base64.decode(b64)) }
     }
 
     constructor(vararg inputs: ByteArray) : this() {

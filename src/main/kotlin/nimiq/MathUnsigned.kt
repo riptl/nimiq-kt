@@ -1,4 +1,4 @@
-package nimiq
+package com.terorie.nimiq
 
 @ExperimentalUnsignedTypes
 inline fun min(a: UInt, b: UInt) =

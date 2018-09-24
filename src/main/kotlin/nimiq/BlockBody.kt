@@ -8,7 +8,7 @@ class BlockBody(
         val minerAddr: Address,
         val transactions: ArrayList<Transaction>,
         val extraData: ByteArray,
-        val prunedAccounts: ArrayList<PrunedAccount>
+        val prunedAccounts: ArrayList<PrunedAccount> = arrayListOf()
 ) {
 
     companion object {

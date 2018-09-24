@@ -38,6 +38,9 @@ object BlockUtils {
     fun compactToDifficulty(compact: UInt): BigInteger =
         Policy.BLOCK_TARGET_MAX / compactToTarget(compact)
 
+    fun difficultyToCompact(difficulty: BigInteger): UInt =
+        targetToCompact(difficultyToTarget(difficulty))
+
     fun difficultyToTarget(difficulty: BigInteger): BigInteger =
         Policy.BLOCK_TARGET_MAX / difficulty
 
