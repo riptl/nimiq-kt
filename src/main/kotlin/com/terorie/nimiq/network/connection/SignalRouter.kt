@@ -46,7 +46,7 @@ class SignalRouter(val peerAddress: PeerAddress) {
         routes.clear()
     }
 
-    fun hasRoute() = routes.isNotEmpty()
+    val hasRoute get() = routes.isNotEmpty()
 
     private fun updateBestRoute() {
         var bestRoute: SignalRoute? = null

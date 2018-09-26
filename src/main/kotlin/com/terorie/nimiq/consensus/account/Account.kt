@@ -24,6 +24,7 @@ abstract class Account : Serializable {
     }
 
     companion object {
+        const val SIZE = 9
         val INITIAL = BasicAccount(0UL)
 
         fun verifyIncomingTransaction(type: Type, tx: Transaction) = when(type) {

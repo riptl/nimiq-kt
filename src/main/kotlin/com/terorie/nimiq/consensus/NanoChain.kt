@@ -22,7 +22,7 @@ class NanoChain(var time: UInt) : BaseChain(ChainDataStore.createVolatile()) {
         headHash = GenesisConfig.genesisHash
     }
 
-    private fun pushProof(proof: ChainProof) {
+    fun pushProof(proof: ChainProof): Boolean {
 
     }
 

@@ -1,9 +1,11 @@
 package com.terorie.nimiq.util.io
 
+import com.terorie.nimiq.util.Blob
 import java.io.ByteArrayOutputStream
 import java.io.EOFException
 import java.io.InputStream
 import java.io.OutputStream
+import kotlin.text.Charsets.US_ASCII
 
 fun InputStream.readFull(n: Int) =
     ByteArray(n).apply { readFull(this) }
@@ -17,6 +19,12 @@ fun InputStream.readFull(b: ByteArray) {
         left -= read
     }
 }
+
+fun <T : Blob> InputStream.read(b: T) =
+    b.apply { unserialize(this@read) }
+
+fun OutputStream.write(b: Blob) =
+    b.serialize(this)
 
 @ExperimentalUnsignedTypes
 fun InputStream.readUByte(): UByte {
@@ -91,6 +99,57 @@ fun OutputStream.writeULong(x: ULong) {
     write((x shr 48).toInt())
     write((x shr 56).toInt())
 }
+
+@ExperimentalUnsignedTypes
+fun InputStream.readVarUInt(): ULong {
+    val first = readUByte().toInt()
+    return when (first) {
+        0xFD -> readUShort().toULong()
+        0xFE -> readUInt().toULong()
+        0xFF -> readULong()
+        else -> first.toULong()
+    }
+}
+
+@ExperimentalUnsignedTypes
+fun OutputStream.writeVarUInt(x: ULong) = when {
+    x < 0xFD -> writeUByte(x.toUByte())
+    x < 0x1_0000 -> {
+        writeUByte(0xFD)
+        writeUShort(x.toUShort())
+    }
+    x < 0x1_0000_0000 -> {
+        writeUByte(0xFE)
+        writeUInt(x.toUInt())
+    }
+    else -> {
+        writeUByte(0xFF)
+        writeULong(x.toULong())
+    }
+}
+
+@ExperimentalUnsignedTypes
+fun varUIntSize(x: ULong) = when {
+    x < 0xFD -> 1
+    x < 0x1_0000 -> 3
+    x < 0x1_0000_0000 -> 5
+    else -> 9
+}
+
+@ExperimentalUnsignedTypes
+fun InputStream.readVarString() =
+    String(readFull(readUByte().toInt()), US_ASCII)
+
+@ExperimentalUnsignedTypes
+fun OutputStream.writeVarString(s: String) {
+    val bytes = s.toByteArray(US_ASCII)
+    writeUByte(bytes.size.toUByte())
+    write(bytes)
+}
+
+@ExperimentalUnsignedTypes
+fun varStringSize(s: String): Int =
+    s.toByteArray(US_ASCII).size
 
 fun assemble(f: (ByteArrayOutputStream) -> Unit): ByteArray =
     ByteArrayOutputStream().apply{f(this)}.toByteArray()

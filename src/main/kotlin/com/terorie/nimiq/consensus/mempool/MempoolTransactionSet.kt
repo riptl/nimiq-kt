@@ -9,6 +9,8 @@ import java.util.*
 @ExperimentalUnsignedTypes
 class MempoolTransactionSet(val txs: SortedSet<Transaction>) {
 
+    constructor() : this(TreeSet())
+
     fun add(tx: Transaction) = txs.add(tx)
     fun remove(tx: Transaction) = txs.remove(tx)
 

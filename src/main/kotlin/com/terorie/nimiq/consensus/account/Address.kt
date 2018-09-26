@@ -3,6 +3,7 @@ package com.terorie.nimiq.consensus.account
 import com.terorie.nimiq.consensus.primitive.HashLight
 import com.terorie.nimiq.util.Base32
 import com.terorie.nimiq.util.Blob
+import org.bouncycastle.util.encoders.Hex
 import java.util.*
 import kotlin.math.ceil
 
@@ -74,5 +75,7 @@ class Address : Blob(SIZE) {
         }
         return userFriendly
     }
+
+    fun toHex() = String(Hex.encode(buf))
 
 }

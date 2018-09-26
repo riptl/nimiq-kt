@@ -3,6 +3,7 @@ package com.terorie.nimiq.consensus.primitive
 import com.terorie.nimiq.util.Blob
 import org.bouncycastle.crypto.digests.Blake2bDigest
 import org.bouncycastle.util.encoders.Base64
+import java.io.InputStream
 
 class HashLight() : Blob(SIZE) {
 
