@@ -26,6 +26,12 @@ fun <T : Blob> InputStream.read(b: T) =
 fun OutputStream.write(b: Blob) =
     b.serialize(this)
 
+fun <T> InputStream.read(enc: Enc<T>): T =
+    enc.deserialize(this)
+
+fun <T> OutputStream.write(enc: Enc<T>, o: T) =
+    enc.serialize(this, o)
+
 @ExperimentalUnsignedTypes
 fun InputStream.readUByte(): UByte {
     val n = read()
