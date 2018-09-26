@@ -16,6 +16,8 @@ class Hash(val algorithm: Algorithm) : Blob(algorithm.size) {
         SHA256(32),
         SHA512(64);
 
+        val id get() = ordinal.toUByte()
+
         companion object {
             fun byID(id: UByte) = values()[id.toInt()]
         }

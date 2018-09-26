@@ -19,30 +19,42 @@ class Block(
         val body: BlockBody?
 ) {
 
-    companion object {
-        fun unserialize(s: InputStream): Block {
-            val header = BlockHeader.unserialize(s)
-            val interlink = BlockInterlink.unserialize(s, header.prevHash)
+    companion object : Enc<Block> {
+        override fun serializedSize(o: Block): Int = with(o) {
+            var v = 147 // header + bodyPresent bool
+            v += BlockInterlink.Encer().serializedSize(interlink)
+            if (body != null)
+                v += BlockBody.serializedSize(body)
+            return v
+        }
+
+        override fun deserialize(s: InputStream): Block {
+            val header = s.read(BlockHeader)
+            val interlink = s.read(BlockInterlink.Encer(header.prevHash))
 
             var body: BlockBody? = null
             val bodyPresent = s.readUByte().toInt()
             if (bodyPresent != 0)
-                body = BlockBody.unserialize(s)
+                body = s.read(BlockBody)
 
             return Block(header, interlink, body)
+        }
+
+        override fun serialize(s: OutputStream, o: Block) = with(o) {
+            s.write(BlockHeader, header)
+            s.write(BlockInterlink.Encer(interlink.prevHash), interlink)
+
+            if (body != null) {
+                s.writeUByte(1)
+                s.write(BlockBody, body)
+            } else {
+                s.writeUByte(0)
+            }
         }
     }
 
     fun serialize(s: OutputStream) {
-        header.serialize(s)
-        interlink.serialize(s)
 
-        if (body != null) {
-            s.writeUByte(1)
-            body.serialize(s)
-        } else {
-            s.writeUByte(0)
-        }
     }
 
     inline val isLight: Boolean
@@ -50,14 +62,6 @@ class Block(
 
     inline val isFull: Boolean
         get() = body != null
-
-    val serializedSize: Int
-        get() {
-            var v = 147 // header + bodyPresent bool
-            v += interlink.serializedSize
-            v += body?.serializedSize ?: 0
-            return v
-        }
 
     private var verified = false
 
@@ -73,7 +77,7 @@ class Block(
         }
 
         // Check that the maximum block size is not exceeded.
-        if (serializedSize > Policy.BLOCK_SIZE_MAX) {
+        if (serializedSize(this) > Policy.BLOCK_SIZE_MAX) {
             return false
         }
 

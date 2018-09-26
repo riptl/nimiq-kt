@@ -23,7 +23,7 @@ abstract class Account : Serializable {
         }
     }
 
-    companion object {
+    companion object : Enc<Account> {
         const val SIZE = 9
         val INITIAL = BasicAccount(0UL)
 
@@ -39,11 +39,27 @@ abstract class Account : Serializable {
             Type.HTLC -> HashTimeLockedContract.verifyOutgoingTransaction(tx)
         }
 
-        fun unserialize(s: InputStream) = when(Type.byID(s.readUByte())) {
-            Type.BASIC -> BasicAccount.unserialize(s)
-            Type.VESTING -> VestingContract.unserialize(s)
-            Type.HTLC -> HashTimeLockedContract.unserialize(s)
+        @Suppress("UNCHECKED_CAST")
+        private fun childEnc(type: Type) : Enc<Account> = when(type) {
+            Type.BASIC -> BasicAccount
+            Type.VESTING -> VestingContract
+            Type.HTLC -> HashTimeLockedContract
+        } as Enc<Account>
+
+        override fun serializedSize(o: Account): Int {
+            return 1 + childEnc(o.type).serializedSize(o)
         }
+
+        override fun deserialize(s: InputStream): Account {
+            val type = Type.byID(s.readUByte())
+            return childEnc(type).deserialize(s)
+        }
+
+        override fun serialize(s: OutputStream, o: Account) = with(o) {
+            s.writeUByte(type.id)
+            childEnc(type).serialize(s, o)
+        }
+
     }
 
     abstract val type: Type

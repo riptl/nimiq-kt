@@ -17,8 +17,16 @@ class BlockBody(
         val prunedAccounts: ArrayList<PrunedAccount> = arrayListOf()
 ) {
 
-    companion object {
-        fun unserialize(s: InputStream): BlockBody {
+    companion object : Enc<BlockBody> {
+        override fun serializedSize(o: BlockBody): Int = with(o) {
+            var size = 25 // Static fields
+            size += extraData.size
+            for (tx in transactions)
+                size += tx.serializedSize
+            return size
+        }
+
+        override fun deserialize(s: InputStream): BlockBody {
             val minerAddr = Address().apply{ unserialize(s) }
             val extraDataLen = s.readUByte()
             val extraData = s.readFull(extraDataLen.toInt())
@@ -32,6 +40,16 @@ class BlockBody(
                 prunedAccs[i] = PrunedAccount.unserialize(s)
 
             return BlockBody(minerAddr, txs, extraData, prunedAccs)
+        }
+
+        override fun serialize(s: OutputStream, o: BlockBody) = with(o) {
+            s.write(minerAddr)
+            s.writeUByte(extraData.size)
+            s.write(extraData)
+            s.writeUShort(transactions.size)
+            transactions.forEach { it.serialize(s) }
+            s.writeUShort(prunedAccounts.size)
+            prunedAccounts.forEach{ it.serialize(s) }
         }
     }
 
@@ -66,24 +84,6 @@ class BlockBody(
 
         // Everything checks out.
         return true
-    }
-
-    fun serialize(s: OutputStream) {
-        minerAddr.serialize(s)
-        s.writeUByte(extraData.size)
-        s.write(extraData)
-        s.writeUShort(transactions.size)
-        transactions.forEach { it.serialize(s) }
-        s.writeUShort(prunedAccounts.size)
-        prunedAccounts.forEach{ it.serialize(s) }
-    }
-
-    val serializedSize: Int get() {
-        var size = 25 // Static fields
-        size += extraData.size
-        for (tx in transactions)
-            size += tx.serializedSize
-        return size
     }
 
     private var _hash: HashLight? = null

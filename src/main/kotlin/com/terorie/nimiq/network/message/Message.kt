@@ -58,26 +58,29 @@ abstract class Message(val type: Type) {
         }
     }
 
-    companion object {
-        private val encoders = HashMap<Type, Enc<Message>>()
-
-        fun register(type: Message.Type, enc: Enc<Message>) {
-            encoders[type] = enc
-        }
-    }
-
     fun serialize(s: OutputStream) {
-        val encoder = encoders[type]
-            ?: throw IllegalStateException("no encoder available for $type")
+        @Suppress("UNCHECKED_CAST")
+        val encoder = (MessageEnc.encoders[type]
+            ?: throw IllegalStateException("no encoder available for $type"))
+            as MessageEnc<Message>
         encoder.serialize(s, this)
     }
 
 }
 
+@Suppress("LeakingThis")
 @ExperimentalUnsignedTypes
-interface MessageEnc<T : Message> : Enc<T> {
+abstract class MessageEnc<T : Message> : Enc<T> {
     companion object {
         const val MAGIC = 0x42042042U
+
+        val encoders = HashMap<Message.Type, MessageEnc<out Message>>()
+    }
+
+    init {
+        val lType = type
+        if (lType != null)
+            encoders[lType] = this
     }
 
     class Header(
@@ -86,11 +89,13 @@ interface MessageEnc<T : Message> : Enc<T> {
             val checksum: UInt
     )
 
+    abstract val type: Message.Type?
+
     override fun serializedSize(o: T): Int =
         12 + varUIntSize(o.type.id) +
         serializedContentSize(o)
 
-    fun serializedContentSize(m: T): Int
+    abstract fun serializedContentSize(m: T): Int
 
     override fun serialize(s: OutputStream, o: T) {
         s.writeUInt(MAGIC)
@@ -100,7 +105,7 @@ interface MessageEnc<T : Message> : Enc<T> {
         serializeContent(s, o)
     }
 
-    fun serializeContent(s: OutputStream, m: T)
+    abstract fun serializeContent(s: OutputStream, m: T)
 
     override fun deserialize(s: InputStream): T {
         val magic = s.readUInt()
@@ -119,5 +124,5 @@ interface MessageEnc<T : Message> : Enc<T> {
         return deserializeContent(s, header)
     }
 
-    fun deserializeContent(s: InputStream, h: Header): T
+    abstract fun deserializeContent(s: InputStream, h: Header): T
 }

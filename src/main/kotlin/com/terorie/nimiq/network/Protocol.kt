@@ -1,8 +1,8 @@
 package com.terorie.nimiq.network
 
-enum class Protocol(id: Int) {
-    DUMB(0),
-    WSS(1),
-    RTC(2),
-    WS(4),
+enum class Protocol(val id: Int, val scheme: String) {
+    DUMB(0, "dumb"),
+    WSS(1, "wss"),
+    RTC(2, "rtc"),
+    WS(4, "ws"),
 }

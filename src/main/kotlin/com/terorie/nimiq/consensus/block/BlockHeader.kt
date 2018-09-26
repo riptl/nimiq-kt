@@ -20,22 +20,35 @@ class BlockHeader(
         val version: UShort
 ) {
 
-    companion object {
+    companion object : Enc<BlockHeader> {
         const val VERSION: UShort = 1U
         val SUPPORTED_VERSIONS = arrayOf(1)
-        const val SERIALIZED_SIZE = 146
 
-        fun unserialize(s: InputStream) = BlockHeader(
-                prevHash = HashLight().apply { unserialize(s) },
-                interlinkHash = HashLight().apply { unserialize(s) },
-                bodyHash = HashLight().apply { unserialize(s) },
-                accountsHash = HashLight().apply { unserialize(s) },
-                nBits = s.readUInt(),
-                height = s.readUInt(),
-                timestamp = s.readUInt(),
-                nonce = s.readUInt(),
-                version = s.readUShort()
+        override fun serializedSize(o: BlockHeader) = 146
+
+        override fun deserialize(s: InputStream) = BlockHeader(
+            prevHash =      s.read(HashLight()),
+            interlinkHash = s.read(HashLight()),
+            bodyHash =      s.read(HashLight()),
+            accountsHash =  s.read(HashLight()),
+            nBits =         s.readUInt(),
+            height =        s.readUInt(),
+            timestamp =     s.readUInt(),
+            nonce =         s.readUInt(),
+            version =       s.readUShort()
         )
+
+        override fun serialize(s: OutputStream, o: BlockHeader) = with(o) {
+            s.writeUShort(version)
+            s.write(prevHash)
+            s.write(interlinkHash)
+            s.write(bodyHash)
+            s.write(accountsHash)
+            s.writeUInt(nBits)
+            s.writeUInt(height)
+            s.writeUInt(timestamp)
+            s.writeUInt(nonce)
+        }
     }
 
     var nonce: UInt = 0U
@@ -59,7 +72,7 @@ class BlockHeader(
     val hash: HashLight
         get() {
             if (_hash == null)
-                _hash = HashLight(assemble { serialize(it) })
+                _hash = HashLight(serializeToByteArray(this))
             return _hash!!
         }
 
@@ -67,25 +80,13 @@ class BlockHeader(
     val pow: HashHard
         get() {
             if (_pow == null)
-                _pow = HashHard(assemble { serialize(it) })
+                _pow = HashHard(serializeToByteArray(this))
             return _pow!!
         }
 
     fun invalidateCache() {
         _hash = null
         _pow = null
-    }
-
-    fun serialize(s: OutputStream) {
-        s.writeUShort(version)
-        prevHash.serialize(s)
-        interlinkHash.serialize(s)
-        bodyHash.serialize(s)
-        accountsHash.serialize(s)
-        s.writeUInt(nBits)
-        s.writeUInt(height)
-        s.writeUInt(timestamp)
-        s.writeUInt(nonce)
     }
 
     fun verifyProofOfWork(): Boolean =

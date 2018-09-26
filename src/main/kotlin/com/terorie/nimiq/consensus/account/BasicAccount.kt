@@ -5,6 +5,7 @@ import com.terorie.nimiq.consensus.transaction.SignatureProof
 import com.terorie.nimiq.consensus.transaction.Transaction
 import com.terorie.nimiq.util.io.*
 import java.io.InputStream
+import java.io.OutputStream
 
 @ExperimentalUnsignedTypes
 class BasicAccount(balance: Satoshi) : Account() {
@@ -13,7 +14,7 @@ class BasicAccount(balance: Satoshi) : Account() {
         this.balance = balance
     }
 
-    companion object {
+    companion object : Enc<BasicAccount> {
         fun verifyIncomingTransaction(tx: Transaction): Boolean {
             if (tx.data.size > 64)
                 return false
@@ -23,8 +24,13 @@ class BasicAccount(balance: Satoshi) : Account() {
         fun verifyOutgoingTransaction(tx: Transaction): Boolean =
                 SignatureProof.verifyTransaction(tx)
 
-        fun unserialize(s: InputStream) =
-                BasicAccount(balance = s.readULong())
+        override fun serializedSize(o: BasicAccount): Int = TODO()
+
+        override fun deserialize(s: InputStream) =
+            BasicAccount(balance = s.readULong())
+
+        override fun serialize(s: OutputStream, o: BasicAccount) =
+            s.writeULong(o.balance)
     }
 
     override val type: Type

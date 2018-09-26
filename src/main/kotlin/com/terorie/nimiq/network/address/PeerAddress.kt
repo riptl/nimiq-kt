@@ -4,6 +4,9 @@ import com.terorie.nimiq.consensus.primitive.PublicKeyNim
 import com.terorie.nimiq.consensus.primitive.SignatureNim
 import com.terorie.nimiq.network.Protocol
 import com.terorie.nimiq.util.Services
+import com.terorie.nimiq.util.io.*
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.InetSocketAddress
 
 @ExperimentalUnsignedTypes
@@ -15,7 +18,23 @@ open class PeerAddress(
         val publicKey: PublicKeyNim?,
         var distance: Int,
         val signature: SignatureNim?
-)
+) {
+
+    companion object : Enc<PeerAddress> {
+        override fun deserialize(s: InputStream): PeerAddress {
+            TODO("not implemented")
+        }
+
+        override fun serialize(s: OutputStream, o: PeerAddress) {
+            TODO("not implemented")
+        }
+
+        override fun serializedSize(o: PeerAddress): Int {
+            TODO("not implemented")
+        }
+    }
+
+}
 
 @ExperimentalUnsignedTypes
 open class WsBasePeerAddress(

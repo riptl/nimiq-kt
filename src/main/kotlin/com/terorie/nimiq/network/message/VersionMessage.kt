@@ -14,12 +14,14 @@ class VersionMessage(
         val genesisHash: HashLight,
         val headHash: HashLight,
         val challengeNonce: ChallengeNonce
-) : Message(Message.Type.VERSION) {
+) : Message(type) {
 
-    companion object : MessageEnc<VersionMessage> {
+    companion object : MessageEnc<VersionMessage>() {
+        override val type = Message.Type.VERSION
+
         override fun deserializeContent(s: InputStream, h: MessageEnc.Header) = VersionMessage(
             version = s.readUInt(),
-            peerAddress = PeerAddress.unserialize(s),
+            peerAddress = PeerAddress.deserialize(s),
             genesisHash = s.read(HashLight()),
             headHash = s.read(HashLight()),
             challengeNonce = s.read(ChallengeNonce())
@@ -27,14 +29,14 @@ class VersionMessage(
 
         override fun serializeContent(s: OutputStream, m: VersionMessage) = with(m) {
             s.writeUInt(version)
-            peerAddress.serialize(s)
+            s.write(PeerAddress, peerAddress)
             s.write(genesisHash)
             s.write(headHash)
             s.write(challengeNonce)
         }
 
         override fun serializedContentSize(m: VersionMessage) =
-            100 + m.peerAddress.serializedSize
+            100 + PeerAddress.serializedSize(m.peerAddress)
     }
 
     class ChallengeNonce : Blob(32)

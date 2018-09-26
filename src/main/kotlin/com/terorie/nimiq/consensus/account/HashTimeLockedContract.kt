@@ -8,6 +8,7 @@ import com.terorie.nimiq.consensus.transaction.TransactionCache
 import com.terorie.nimiq.util.io.*
 import java.io.ByteArrayInputStream
 import java.io.InputStream
+import java.io.OutputStream
 
 @ExperimentalUnsignedTypes
 class HashTimeLockedContract(
@@ -20,7 +21,7 @@ class HashTimeLockedContract(
         val totalAmount: ULong
 ) : Contract(balance) {
 
-    companion object {
+    companion object : Enc<HashTimeLockedContract> {
         fun create(balance: Satoshi, transaction: Transaction): HashTimeLockedContract {
             val s = ByteArrayInputStream(transaction.data)
 
@@ -104,15 +105,32 @@ class HashTimeLockedContract(
             }
         }
 
-        fun unserialize(s: InputStream) = HashTimeLockedContract(
-                balance = s.readULong(),
-                sender = Address().apply { unserialize(s) },
-                recipient = Address().apply { unserialize(s) },
-                hashRoot = Hash(Hash.Algorithm.byID(s.readUByte())).apply { unserialize(s) },
-                hashCount = s.readUByte(),
-                timeout = s.readUInt(),
-                totalAmount = s.readULong()
+        override fun serializedSize(o: HashTimeLockedContract): Int {
+            var size = 8 + 20 + 20 + 1 + 1 + 4 + 8
+            size += o.hashRoot.size
+            return size
+        }
+
+        override fun deserialize(s: InputStream) = HashTimeLockedContract(
+            balance = s.readULong(),
+            sender = s.read(Address()),
+            recipient = s.read(Address()),
+            hashRoot = s.read(Hash(Hash.Algorithm.byID(s.readUByte()))), // TODO make nicer
+            hashCount = s.readUByte(),
+            timeout = s.readUInt(),
+            totalAmount = s.readULong()
         )
+
+        override fun serialize(s: OutputStream, o: HashTimeLockedContract) = with(o) {
+            s.writeULong(balance)
+            s.write(sender)
+            s.write(recipient)
+            s.writeUByte(hashRoot.algorithm.id)
+            s.write(hashRoot)
+            s.writeUByte(hashCount)
+            s.writeUInt(timeout)
+            s.writeULong(totalAmount)
+        }
     }
 
     override val type: Type

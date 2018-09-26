@@ -36,13 +36,33 @@ class BlockInterlink(
 
             return BlockInterlink(hashes, prevHash, repeatBits, compressed)
         }
+    }
 
-        fun unserialize(s: InputStream, prevHash: HashLight): BlockInterlink {
+    private var _hash: HashLight? = null
+    val hash: HashLight
+        get() {
+            if (_hash == null) {
+                val hashes = ArrayList<HashLight>()
+                hashes += HashLight(this.repeatBits)
+                hashes += GenesisConfig.genesisHash
+                hashes.addAll(compressed)
+                _hash = MerkleTree.computeRoot(hashes)
+            }
+            return _hash!!
+        }
+
+    class Encer(val prevHash: HashLight? = null) : Enc<BlockInterlink> {
+
+        override fun serializedSize(o: BlockInterlink) =
+            1 + o.repeatBits.size +
+            HashLight.SIZE * o.compressed.size
+
+        override fun deserialize(s: InputStream): BlockInterlink {
             val count = s.readUByte()
             val repeatBitsSize = ceil(count.toInt() / 8.0).toInt()
             val repeatBits = s.readFull(repeatBitsSize)
 
-            var hash = prevHash
+            var hash = prevHash!!
             val hashes = ArrayList<HashLight>()
             val compressed = ArrayList<HashLight>()
             for (i in 0 until count.toInt()) {
@@ -57,31 +77,15 @@ class BlockInterlink(
 
             return BlockInterlink(hashes, prevHash, repeatBits, compressed)
         }
-    }
 
-    fun serialize(s: OutputStream) {
-        // TODO Overflow check
-        s.writeUByte(hashes.size.toUByte())
-        s.write(repeatBits)
-        for (hash in compressed)
-            hash.serialize(s)
-    }
-
-    val serializedSize: Int
-        get() = 1 + repeatBits.size +
-            HashLight.SIZE * compressed.size
-
-    private var _hash: HashLight? = null
-    val hash: HashLight
-        get() {
-            if (_hash == null) {
-                val hashes = ArrayList<HashLight>()
-                hashes += HashLight(this.repeatBits)
-                hashes += GenesisConfig.genesisHash
-                hashes.addAll(compressed)
-                _hash = MerkleTree.computeRoot(hashes)
-            }
-            return _hash!!
+        override fun serialize(s: OutputStream, o: BlockInterlink) = with(o) {
+            // TODO Overflow check
+            s.writeUByte(hashes.size.toUByte())
+            s.write(repeatBits)
+            for (hash in compressed)
+                s.write(hash)
         }
+
+    }
 
 }

@@ -8,6 +8,7 @@ import com.terorie.nimiq.util.io.*
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.io.OutputStream
 
 @ExperimentalUnsignedTypes
 class VestingContract(
@@ -19,7 +20,7 @@ class VestingContract(
         val vestingTotalAmount: ULong = balance
 ) : Contract(balance) {
 
-    companion object {
+    companion object : Enc<VestingContract> {
         fun create(balance: Satoshi, blockHeight: UInt, tx: Transaction): VestingContract {
             val s = ByteArrayInputStream(tx.data)
             val owner = Address().apply { unserialize(s) }
@@ -80,14 +81,26 @@ class VestingContract(
             return true
         }
 
-        fun unserialize(s: InputStream) = VestingContract(
-                balance = s.readULong(),
-                owner = Address().apply { unserialize(s) },
-                vestingStart = s.readUInt(),
-                vestingStepBlocks = s.readUInt(),
-                vestingStepAmount = s.readULong(),
-                vestingTotalAmount = s.readULong()
+        override fun serializedSize(o: VestingContract) =
+            8 + 20 + 4 + 4 + 8 + 8
+
+        override fun deserialize(s: InputStream) = VestingContract(
+            balance = s.readULong(),
+            owner = s.read(Address()),
+            vestingStart = s.readUInt(),
+            vestingStepBlocks = s.readUInt(),
+            vestingStepAmount = s.readULong(),
+            vestingTotalAmount = s.readULong()
         )
+
+        override fun serialize(s: OutputStream, o: VestingContract) = with(o) {
+            s.writeULong(balance)
+            s.write(owner)
+            s.writeUInt(vestingStart)
+            s.writeUInt(vestingStepBlocks)
+            s.writeULong(vestingStepAmount)
+            s.writeULong(vestingTotalAmount)
+        }
     }
 
     override val type: Type

@@ -47,8 +47,19 @@ class InventoryMessage(
     val vectors: List<InvVector>
 ) : Message(type) {
 
-    companion object : MessageEnc<InventoryMessage> {
+    companion object : MessageEnc<InventoryMessage>() {
         const val VECTORS_MAX_COUNT = 1000
+
+        init {
+            val e = MessageEnc.encoders
+            e[Message.Type.INV] = this
+            e[Message.Type.GET_DATA] = this
+            e[Message.Type.GET_HEADER] = this
+            e[Message.Type.NOT_FOUND] = this
+        }
+
+        // Custom type
+        override val type: Type? = null
 
         override fun deserializeContent(s: InputStream, h: MessageEnc.Header): InventoryMessage {
             val count = s.readUShort().toInt()
