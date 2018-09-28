@@ -16,11 +16,11 @@ class SignatureProof(
         val signature: SignatureNim?
 ) {
 
-    companion object {
+    companion object : Enc<SignatureProof> {
         fun verifyTransaction(t: Transaction): Boolean {
             val buffer = t.proof
             val inStream = ByteArrayInputStream(buffer)
-            val proof = unserialize(inStream)
+            val proof = inStream.read(SignatureProof)
 
             // Reject proof if it is longer than needed.
             if (inStream.available() > 0)
@@ -31,22 +31,33 @@ class SignatureProof(
         }
 
         fun singleSig(publicKey: PublicKeyNim, signature: SignatureNim) =
-                SignatureProof(publicKey, MerklePath(), signature)
+            SignatureProof(publicKey, MerklePath(), signature)
 
         fun multiSig(signerKey: PublicKeyNim, publicKeys: Array<PublicKeyNim>, signature: SignatureNim) =
-                SignatureProof(
-                        signerKey,
-                        MerklePath.compute(
-                                publicKeys.map { it.hash },
-                                signerKey.hash),
-                        signature
-                )
+            SignatureProof(
+                signerKey,
+                MerklePath.compute(
+                    publicKeys.map { it.hash },
+                    signerKey.hash),
+                signature
+            )
 
-        fun unserialize(s: InputStream) = SignatureProof(
-                PublicKeyNim().apply { unserialize(s) },
-                MerklePath.unserialize(s),
-                SignatureNim().apply { unserialize(s) }
+        override fun serializedSize(o: SignatureProof): Int {
+            TODO("not implemented: serializedSize")
+        }
+
+        override fun deserialize(s: InputStream) = SignatureProof(
+            publicKey = s.read(PublicKeyNim()),
+            merklePath = s.read(MerklePath),
+            signature = s.read(SignatureNim())
         )
+
+        override fun serialize(s: OutputStream, o: SignatureProof) = with(o) {
+            s.write(publicKey)
+            s.write(MerklePath, merklePath)
+            if (signature != null)
+                s.write(signature)
+        }
     }
 
     fun verify(sender: Address?, data: ByteArray) =
@@ -60,12 +71,6 @@ class SignatureProof(
         val merkleRoot = merklePath.computeRoot(publicKey.hash)
         val signerAddr = Address.fromHash(merkleRoot)
         return signerAddr == sender
-    }
-
-    fun serialize(b: OutputStream) {
-        publicKey.serialize(b)
-        merklePath.serialize(b)
-        signature?.serialize(b)
     }
 
 }

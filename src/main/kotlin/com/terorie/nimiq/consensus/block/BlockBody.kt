@@ -27,7 +27,7 @@ class BlockBody(
         }
 
         override fun deserialize(s: InputStream): BlockBody {
-            val minerAddr = Address().apply{ unserialize(s) }
+            val minerAddr = s.read(Address())
             val extraDataLen = s.readUByte()
             val extraData = s.readFull(extraDataLen.toInt())
             val numTxs = s.readUShort().toInt()
@@ -37,7 +37,7 @@ class BlockBody(
             val numPrunedAccs = s.readUShort().toInt()
             val prunedAccs = ArrayList<PrunedAccount>()
             for (i in 0 until numPrunedAccs)
-                prunedAccs[i] = PrunedAccount.unserialize(s)
+                prunedAccs[i] = s.read(PrunedAccount)
 
             return BlockBody(minerAddr, txs, extraData, prunedAccs)
         }

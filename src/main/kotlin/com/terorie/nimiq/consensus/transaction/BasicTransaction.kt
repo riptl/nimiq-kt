@@ -45,13 +45,13 @@ class BasicTransaction(
             }
 
             return BasicTransaction(
-                    senderPubKey = PublicKeyNim().apply { unserialize(s) },
-                    recipient = Address().apply { unserialize(s) },
-                    value = s.readULong(),
-                    fee = s.readULong(),
-                    validityStartHeight = s.readUInt(),
-                    networkId = s.readUByte(),
-                    signature = SignatureNim().apply { unserialize(s) }
+                senderPubKey = s.read(PublicKeyNim()),
+                recipient = s.read(Address()),
+                value = s.readULong(),
+                fee = s.readULong(),
+                validityStartHeight = s.readUInt(),
+                networkId = s.readUByte(),
+                signature = s.read(SignatureNim())
             )
         }
     }

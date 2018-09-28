@@ -38,9 +38,9 @@ class ExtendedTransaction(
 
             val dataSize = s.readUShort()
             val data = s.readFull(dataSize.toInt())
-            val sender = Address().apply { unserialize(s) }
+            val sender = s.read(Address())
             val senderType = Account.Type.byID(s.readUByte())
-            val recipient = Address().apply { unserialize(s) }
+            val recipient = s.read(Address())
             val recipientType = Account.Type.byID(s.readUByte())
             val value = s.readULong()
             val fee = s.readULong()
@@ -50,8 +50,8 @@ class ExtendedTransaction(
             val proofSize = s.readUShort()
             val proof = s.readFull(proofSize.toInt())
             return ExtendedTransaction(
-                    sender, senderType, recipient, recipientType,
-                    value, fee, vsh, flags, data, proof, networkID)
+                sender, senderType, recipient, recipientType,
+                value, fee, vsh, flags, data, proof, networkID)
         }
     }
 

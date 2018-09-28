@@ -10,7 +10,7 @@ import kotlin.math.ceil
 @ExperimentalUnsignedTypes
 class MerklePath(val nodes: List<Node> = ArrayList()) {
 
-    companion object {
+    companion object : Enc<MerklePath> {
         fun compute(values: List<HashLight>, leafHash: HashLight): MerklePath {
             val path = ArrayList<Node>()
             doCompute(values, leafHash, path)
@@ -48,7 +48,28 @@ class MerklePath(val nodes: List<Node> = ArrayList()) {
             return Pair(hash, false)
         }
 
-        fun unserialize(s: InputStream): MerklePath {
+        override fun serializedSize(o: MerklePath): Int {
+            TODO("not implemented: serializedSize")
+        }
+
+        override fun serialize(s: OutputStream, o: MerklePath) = with(o) {
+            s.write(nodes.size)
+
+            // Compress nodes
+            val leftBitsSize = ceil(nodes.size / 8f).toInt()
+            val leftBits = ByteArray(leftBitsSize)
+
+            for ((i, n) in nodes.withIndex()) {
+                if (n.left) {
+                    var x = leftBits[i/8].toInt()
+                    x = x or (0x80 ushr i % 8)
+                    leftBits[i/8] = x.toByte()
+                }
+            }
+            s.write(leftBits)
+        }
+
+        override fun deserialize(s: InputStream): MerklePath {
             val count = s.readUByte().toInt()
             val leftBitsSize = ceil(count / 8.0).toInt()
             val leftBits = s.readFull(leftBitsSize)
@@ -56,7 +77,7 @@ class MerklePath(val nodes: List<Node> = ArrayList()) {
             val nodes = Array(count) { i ->
                 val cell = leftBits[i / 8].toUByte().toInt()
                 val left = (cell and (0x80 shr (i % 8))) != 0
-                val hash = HashLight().apply { unserialize(s) }
+                val hash = s.read(HashLight())
                 Node(hash, left)
             }
             return MerklePath(nodes.toList())
@@ -79,23 +100,6 @@ class MerklePath(val nodes: List<Node> = ArrayList()) {
             root = HashLight(concat)
         }
         return root
-    }
-
-    fun serialize(s: OutputStream) {
-        s.write(nodes.size)
-
-        // Compress nodes
-        val leftBitsSize = ceil(nodes.size / 8f).toInt()
-        val leftBits = ByteArray(leftBitsSize)
-
-        for ((i, n) in nodes.withIndex()) {
-            if (n.left) {
-                var x = leftBits[i/8].toInt()
-                x = x or (0x80 ushr i % 8)
-                leftBits[i/8] = x.toByte()
-            }
-        }
-        s.write(leftBits)
     }
 
     class Node(val hash: HashLight, val left: Boolean)

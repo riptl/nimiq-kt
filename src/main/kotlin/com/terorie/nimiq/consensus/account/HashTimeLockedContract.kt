@@ -25,10 +25,10 @@ class HashTimeLockedContract(
         fun create(balance: Satoshi, transaction: Transaction): HashTimeLockedContract {
             val s = ByteArrayInputStream(transaction.data)
 
-            val sender = Address().apply { unserialize(s) }
-            val recipient = Address().apply { unserialize(s) }
+            val sender = s.read(Address())
+            val recipient = s.read(Address())
             val hashAlgorithm = Hash.Algorithm.byID(s.readUByte())
-            val hashRoot = Hash(hashAlgorithm).apply { unserialize(s) }
+            val hashRoot = s.read(Hash(hashAlgorithm))
             val hashCount = s.readUByte()
             val timeout = s.readUInt()
             val totalAmount = s.readULong()
@@ -63,8 +63,8 @@ class HashTimeLockedContract(
                     ProofType.REGULAR_TRANSFER -> {
                         val hashAlgorithm = Hash.Algorithm.byID(s.readUByte())
                         val hashDepth = s.readUByte()
-                        val hashRoot = Hash(hashAlgorithm).apply{ unserialize(s) }
-                        val preImage = Hash(hashAlgorithm).apply{ unserialize(s) }
+                        val hashRoot = s.read(Hash(hashAlgorithm))
+                        val preImage = s.read(Hash(hashAlgorithm))
 
                         // Verify that the preImage hashed hashDepth times matches the _provided_ hashRoot.
                         for (i in 0 until hashDepth.toInt())
@@ -74,21 +74,21 @@ class HashTimeLockedContract(
                             return false
 
                         // Signature proof of the HTLC recipient
-                        if (!SignatureProof.unserialize(s).verify(null, assemble { tx.serializeContent(it) }))
+                        if (!s.read(SignatureProof).verify(null, assemble { tx.serializeContent(it) }))
                             return false
                     }
                     ProofType.EARLY_RESOLVE -> {
                         // Signature proof of the HTLC recipient
-                        if (!SignatureProof.unserialize(s).verify(null, assemble { tx.serializeContent(it) }))
+                        if (!s.read(SignatureProof).verify(null, assemble { tx.serializeContent(it) }))
                             return false
 
                         // Signature proof of the HTLC creator
-                        if (!SignatureProof.unserialize(s).verify(null, assemble { tx.serializeContent(it) }))
+                        if (!s.read(SignatureProof).verify(null, assemble { tx.serializeContent(it) }))
                             return false
                     }
                     ProofType.TIMEOUT_RESOLVE -> {
                         // Signature proof of the HTLC creator
-                        if (!SignatureProof.unserialize(s).verify(null, assemble { tx.serializeContent(it) }))
+                        if (!s.read(SignatureProof).verify(null, assemble { tx.serializeContent(it) }))
                             return false
                     }
                     else ->
@@ -152,7 +152,7 @@ class HashTimeLockedContract(
                 // Check that the provided hashRoot is correct
                 val hashAlgorithm = Hash.Algorithm.byID(s.readUByte())
                 val hashDepth = s.readUByte()
-                val _hashRoot = Hash(hashAlgorithm).apply { unserialize(s) }
+                val _hashRoot = s.read(Hash(hashAlgorithm))
                 if (_hashRoot != hashRoot)
                     throw IllegalArgumentException("Proof error")
 
@@ -160,7 +160,7 @@ class HashTimeLockedContract(
                 s.skip(hashAlgorithm.size.toLong())
 
                 // Verify that the transaction is signed by the authorized recipient
-                if (!SignatureProof.unserialize(s).isSignedBy(recipient))
+                if (!s.read(SignatureProof).isSignedBy(recipient))
                     throw IllegalArgumentException("Proof error")
 
                 minCap =
@@ -169,11 +169,11 @@ class HashTimeLockedContract(
             }
             ProofType.EARLY_RESOLVE -> {
                 // Signature proof of the HTLC recipient
-                if (!SignatureProof.unserialize(s).isSignedBy(recipient))
+                if (!s.read(SignatureProof).isSignedBy(recipient))
                     throw IllegalArgumentException("Proof error")
 
                 // Signature proof of the HTLC creator
-                if (!SignatureProof.unserialize(s).isSignedBy(sender))
+                if (!s.read(SignatureProof).isSignedBy(sender))
                     throw IllegalArgumentException("Proof error")
             }
             ProofType.TIMEOUT_RESOLVE -> {
@@ -181,7 +181,7 @@ class HashTimeLockedContract(
                     throw IllegalArgumentException("Proof error")
 
                 // Signature proof of the HTLC creator
-                if (!SignatureProof.unserialize(s).isSignedBy(sender))
+                if (!s.read(SignatureProof).isSignedBy(sender))
                     throw IllegalArgumentException("Proof error")
             }
             else ->

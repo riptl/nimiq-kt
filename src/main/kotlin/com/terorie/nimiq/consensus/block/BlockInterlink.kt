@@ -69,7 +69,7 @@ class BlockInterlink(
                 val maskBit = (1 shl (7 - (i % 8))).toByte()
                 val repeated = (repeatBits[i/8] or maskBit) != 0.toByte()
                 if (!repeated) {
-                    hash = HashLight().apply { unserialize(s) }
+                    hash = s.read(HashLight())
                     compressed += hash
                 }
                 hashes += hash

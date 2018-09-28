@@ -18,7 +18,7 @@ class InvVector(val type: Type, val hash: HashLight) {
         BLOCK(2U),
     }
 
-    companion object {
+    companion object : Enc<InvVector> {
         fun fromBlock(block: Block) =
             InvVector(Type.BLOCK, block.header.hash)
 
@@ -28,15 +28,17 @@ class InvVector(val type: Type, val hash: HashLight) {
         fun fromTransaction(tx: Transaction) =
             InvVector(Type.TRANSACTION, tx.hash)
 
-        fun unserialize(s: InputStream) = InvVector(
+        override fun serializedSize(o: InvVector) = 36
+
+        override fun deserialize(s: InputStream)= InvVector(
             type = Type.values()[s.readUInt().toInt()],
             hash = s.read(HashLight())
         )
-    }
 
-    fun serialize(s: OutputStream) {
-        s.writeUInt(type.id)
-        hash.serialize(s)
+        override fun serialize(s: OutputStream, o: InvVector) = with(o) {
+            s.writeUInt(type.id)
+            hash.serialize(s)
+        }
     }
 
 }
@@ -65,14 +67,14 @@ class InventoryMessage(
             val count = s.readUShort().toInt()
             val vectors = ArrayList<InvVector>()
             for (i in 0..count)
-                vectors.add(InvVector.unserialize(s))
+                vectors.add(s.read(InvVector))
             return InventoryMessage(h.type, vectors)
         }
 
         override fun serializeContent(s: OutputStream, m: InventoryMessage) = with(m) {
             s.writeUShort(vectors.size)
             for (vector in vectors)
-                vector.serialize(s)
+                s.write(InvVector, vector)
         }
 
         override fun serializedContentSize(m: InventoryMessage): Int = with(m)

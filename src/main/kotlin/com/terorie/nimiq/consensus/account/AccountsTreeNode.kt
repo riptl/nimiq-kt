@@ -45,6 +45,9 @@ abstract class AccountsTreeNode(val prefix: String) {
     abstract val hasSingleChild: Boolean
     abstract val hasChildren: Boolean
 
+    fun isChildOf(parent: AccountsTreeBranch): Boolean =
+        parent.childSuffixes.contains(prefix)
+
 }
 
 @ExperimentalUnsignedTypes
@@ -89,6 +92,9 @@ class AccountsTreeBranch(
         }
     }
 
+    fun getChildHash(prefix: String): HashLight? =
+        childHashes[getChildIndex(prefix)]
+
     private fun getChildIndex(prefix: String): Int {
         if (prefix.substring(0..this.prefix.length) == prefix)
             throw IllegalArgumentException("Prefix $prefix is not a child of the current node ${this.prefix}")
@@ -127,9 +133,24 @@ class AccountsTreeBranch(
         childSuffixes.find { it != null } != null
 
     fun getFirstChild(): String? {
-        val suffix = childSuffixes.first { it != null }
+        val suffix = childSuffixes.find { it != null }
             ?: return null
         return prefix + suffix
+    }
+
+    fun getLastChild(): String? {
+        val suffix = childSuffixes.findLast { it != null }
+            ?: return null
+        return prefix + suffix
+    }
+
+    fun getChildren(): Sequence<String> =
+        childSuffixes.asSequence().filterNotNull()
+
+    fun getChild(prefix: String): String? {
+        val suffix = childSuffixes[getChildIndex(prefix)]
+            ?: return null
+        return this.prefix + suffix
     }
 
 }
@@ -144,7 +165,7 @@ class AccountsTreeTerminal(
         const val SIZE = Account.SIZE
 
         fun deserializeContent(prefix: String, s: InputStream) =
-            AccountsTreeTerminal(prefix, Account.unserialize(s))
+            AccountsTreeTerminal(prefix, s.read(Account))
 
         fun serialize(s: OutputStream, o: AccountsTreeTerminal) =
             o.account.serialize(s)

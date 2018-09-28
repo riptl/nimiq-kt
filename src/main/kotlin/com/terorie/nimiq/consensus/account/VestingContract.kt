@@ -23,7 +23,7 @@ class VestingContract(
     companion object : Enc<VestingContract> {
         fun create(balance: Satoshi, blockHeight: UInt, tx: Transaction): VestingContract {
             val s = ByteArrayInputStream(tx.data)
-            val owner = Address().apply { unserialize(s) }
+            val owner = s.read(Address())
             val vestingTotalAmount: ULong
             val vestingStart: UInt
             val vestingStepBlocks: UInt
@@ -66,7 +66,7 @@ class VestingContract(
 
         fun verifyOutgoingTransaction(tx: Transaction): Boolean {
             val proofStream = ByteArrayInputStream(tx.proof)
-            val proof = SignatureProof.unserialize(proofStream)
+            val proof = proofStream.read(SignatureProof)
 
             val txData = ByteArrayOutputStream()
                     .apply { tx.serialize(this) }
@@ -117,7 +117,7 @@ class VestingContract(
                 throw IllegalArgumentException("Balance error")
 
             val proofBuf = ByteArrayInputStream(transaction.proof)
-            if (!SignatureProof.unserialize(proofBuf).isSignedBy(owner))
+            if (!proofBuf.read(SignatureProof).isSignedBy(owner))
                 throw IllegalArgumentException("Proof error")
         }
         return super.withOutgoingTransaction(transaction, blockHeight, txCache, revert)
