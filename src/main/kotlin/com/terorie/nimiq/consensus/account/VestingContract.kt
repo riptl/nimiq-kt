@@ -68,9 +68,7 @@ class VestingContract(
             val proofStream = ByteArrayInputStream(tx.proof)
             val proof = proofStream.read(SignatureProof)
 
-            val txData = ByteArrayOutputStream()
-                    .apply { tx.serialize(this) }
-                    .toByteArray()
+            val txData = Transaction.serializeToByteArray(tx)
 
             if (!proof.verify(sender = null, data = txData))
                 return false

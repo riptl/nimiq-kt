@@ -37,7 +37,7 @@ class BasicAccount(balance: Satoshi) : Account() {
         get() = Type.BASIC
 
     override fun withBalance(balance: Satoshi): Account =
-            BasicAccount(balance)
+        BasicAccount(balance)
 
     fun withContractCommand(tx: Transaction, blockHeight: UInt, revert: Boolean = false) {
         if (!revert && tx.recipientType !== Type.BASIC &&

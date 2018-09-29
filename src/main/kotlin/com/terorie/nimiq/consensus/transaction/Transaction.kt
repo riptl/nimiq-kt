@@ -7,37 +7,47 @@ import com.terorie.nimiq.consensus.primitive.HashLight
 import com.terorie.nimiq.consensus.primitive.Satoshi
 import com.terorie.nimiq.util.io.*
 import org.bouncycastle.util.Arrays
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
 @ExperimentalUnsignedTypes
 abstract class Transaction(
-        val sender: Address,
-        val senderType: Account.Type,
-        val recipient: Address,
-        val recipientType: Account.Type,
-        val value: Satoshi,
-        val fee: Satoshi,
-        val validityStartHeight: UInt,
-        val flags: UByte,
-        val data: ByteArray,
-        val proof: ByteArray,
-        val networkId: UByte = GenesisConfig.networkID
+    val sender: Address,
+    val senderType: Account.Type,
+    val recipient: Address,
+    val recipientType: Account.Type,
+    val value: Satoshi,
+    val fee: Satoshi,
+    val validityStartHeight: UInt,
+    val flags: UByte,
+    val data: ByteArray,
+    val proof: ByteArray,
+    val networkId: UByte = GenesisConfig.networkID
 ) : Comparable<Transaction> {
 
-    companion object {
+    companion object : Enc<Transaction> {
         const val FLAG_NONE: UByte = 0U
         const val FLAG_CONTACT_CREATION: UByte = 0b1U
         const val FLAG_ALL: UByte = 0b1U
 
-        fun unserialize(s: InputStream) = when (s.readUByte().toInt()) {
-            Format.BASIC.ordinal ->
-                BasicTransaction.unserialize(s, needType = false)
-            Format.EXTENDED.ordinal ->
-                ExtendedTransaction.unserialize(s, needType = false)
-            else -> throw IllegalArgumentException("Invalid transaction")
+        @Suppress("UNCHECKED_CAST")
+        private fun getEnc(format: Format) = when(format) {
+            Format.BASIC -> BasicTransaction
+            Format.EXTENDED -> ExtendedTransaction
+        } as Enc<Transaction>
+
+        override fun serializedSize(o: Transaction) =
+            1 + getEnc(o.format).serializedSize(o)
+
+        override fun deserialize(s: InputStream): Transaction {
+            val formatId = s.readUByte().toInt()
+            val format = Format.values()[formatId]
+            return getEnc(format).deserialize(s)
+        }
+
+        override fun serialize(s: OutputStream, o: Transaction) = with(o) {
+            s.writeUByte(format.id)
+            getEnc(format).serialize(s, this)
         }
     }
 
@@ -46,9 +56,6 @@ abstract class Transaction(
     }
 
     abstract val format: Format
-
-    abstract fun serialize(s: OutputStream)
-    abstract val serializedSize: Int
 
     var _valid: Boolean? = null
     fun verify(networkId: UByte = GenesisConfig.networkID): Boolean {
@@ -81,13 +88,9 @@ abstract class Transaction(
 
     open fun getContactCreationAddress(): Address {
         // TODO Efficiency
-        // Copy with serialize/unserialize
-        val tx = unserialize(
-                ByteArrayInputStream(
-                        ByteArrayOutputStream()
-                                .apply { serialize(this) }
-                                .toByteArray()
-                ))
+        // Copy with serialize/deserialize
+        val buf = serializeToByteArray(this)
+        val tx = deserializeFromByteArray(buf)
         Address.NULL.copyTo(tx.recipient)
         tx._hash = null
         return Address.fromHash(tx.hash)
@@ -139,5 +142,7 @@ abstract class Transaction(
         s.writeUByte(networkId)
         s.writeUByte(flags)
     }
+
+    inline val serializedSize get() = serializedSize(this)
 
 }

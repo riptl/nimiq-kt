@@ -9,15 +9,15 @@ import java.math.BigInteger
 
 @ExperimentalUnsignedTypes
 class BlockHeader(
-        val prevHash: HashLight,
-        val interlinkHash: HashLight,
-        val bodyHash: HashLight,
-        val accountsHash: HashLight,
-        val nBits: UInt,
-        val height: UInt,
-        val timestamp: UInt,
-        nonce: UInt,
-        val version: UShort
+    val prevHash: HashLight,
+    val interlinkHash: HashLight,
+    val bodyHash: HashLight,
+    val accountsHash: HashLight,
+    val nBits: UInt,
+    val height: UInt,
+    val timestamp: UInt,
+    nonce: UInt,
+    val version: UShort = VERSION
 ) {
 
     companion object : Enc<BlockHeader> {

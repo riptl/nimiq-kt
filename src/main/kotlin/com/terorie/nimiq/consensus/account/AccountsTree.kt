@@ -4,7 +4,7 @@ import com.terorie.nimiq.consensus.primitive.HashLight
 import java.lang.IllegalStateException
 
 @ExperimentalUnsignedTypes
-class AccountsTree(private val store: AccountsTreeStore) {
+open class AccountsTree(private val store: AccountsTreeStore) {
 
     operator fun get(address: Address) =
         (store.get(address.toHex())
@@ -67,7 +67,7 @@ class AccountsTree(private val store: AccountsTreeStore) {
         // If the node prefix matches and there are address bytes left, descend into
         // the matching child node if one exists.
         if (_node is AccountsTreeBranch) {
-            val childPrefix = _node.getChild(prefix)
+            val childPrefix = _node.getChild(prefix)!!
             val childNode = store.get(childPrefix)
             if (childNode != null) {
                 rootPath.add(node)
@@ -91,7 +91,7 @@ class AccountsTree(private val store: AccountsTreeStore) {
         // Walk along the rootPath towards the root node starting with the
         // immediate predecessor of the node specified by 'prefix'.
         for (i in rootPath.size - 1 downTo 0) {
-            var node = rootPath[i]
+            var node = rootPath[i] as AccountsTreeBranch
             node = node.withoutChild(_prefix)
 
             // If the node has only a single child, merge it with the next node.
@@ -125,13 +125,13 @@ class AccountsTree(private val store: AccountsTreeStore) {
         throw IllegalStateException()
     }
 
-    private fun updateKeys(prefix: String, nodeHash: HashLight, rootPath: ArrayList<AccountsTreeNode>) {
+    private fun updateKeys(prefix: String, nodeHash: HashLight, rootPath: List<AccountsTreeNode>) {
         var _prefix = prefix
         var _nodeHash = nodeHash
         // Walk along the rootPath towards the root node starting with the
         // immediate predecessor of the node specified by 'prefix'.
         for (i in rootPath.size - 1 downTo 0) {
-            var node = rootPath[i]
+            var node = rootPath[i] as AccountsTreeBranch
             node = node.withChild(_prefix, _nodeHash)
             store.put(node)
             _prefix = node.prefix
@@ -140,5 +140,7 @@ class AccountsTree(private val store: AccountsTreeStore) {
         }
         return
     }
+
+    //fun synchronousTransaction(enableWatchdog: Boolean = true) = TODO()
 
 }

@@ -11,7 +11,7 @@ class HeaderChain(val headers: ArrayList<BlockHeader>) {
     fun serialize(s: OutputStream) {
         s.writeUShort(headers.size.toUShort())
         for (header in headers)
-            header.serialize(s)
+            BlockHeader.serialize(s, header)
     }
 
     fun verify(): Boolean {

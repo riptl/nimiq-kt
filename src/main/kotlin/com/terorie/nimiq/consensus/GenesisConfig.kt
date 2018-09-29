@@ -58,34 +58,34 @@ object GenesisConfig {
             seed(wss, "seed-20.nimiq.com", 8443, "1fc33f93273d94dd2cf7470274c27ecb1261ec983e43bdbb281803c0a09e68d5")
         )
         seedLists = arrayListOf(
-                SeedListURL(
-                        url = URL("https://nimiq.community/seeds.txt"),
-                        publicKey = PublicKeyNim.fromHex("8b4ae04557f490102036ce3e570b39058c92fc5669083fb9bbb6effc91dc3c71")
-                )
+            SeedListURL(
+                url = URL("https://nimiq.community/seeds.txt"),
+                publicKey = PublicKeyNim.fromHex("8b4ae04557f490102036ce3e570b39058c92fc5669083fb9bbb6effc91dc3c71")
+            )
         )
         genesisBlock = Block(
-                BlockHeader(
-                        prevHash = HashLight(),
-                        interlinkHash = HashLight(),
-                        bodyHash = HashLight.fromBase64("fNqaf98GZVkFrl29nFNUUUcbB4+m898OKH5bD7R6Vzo="),
-                        accountsHash = HashLight.fromBase64("H+/UTx+pcYX9oh6VdUXJfcdkP6fk792G4KpCRNHgvFw="),
-                        nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
-                        height = 1U,
-                        timestamp = 1523727000U,
-                        nonce = 137689U,
-                        version = 1U
-                ),
-                BlockInterlink(
-                        hashes = arrayListOf(),
-                        prevHash = HashLight(),
-                        repeatBits = byteArrayOf(),
-                        compressed = arrayListOf()
-                ),
-                BlockBody(
-                        minerAddr = Address(),
-                        transactions = arrayListOf(),
-                        extraData = Base64.decode("bG92ZSBhaSBhbW9yIG1vaGFiYmF0IGh1YnVuIGNpbnRhIGx5dWJvdiBiaGFsYWJhc2EgYW1vdXIga2F1bmEgcGknYXJhIGxpZWJlIGVzaHEgdXBlbmRvIHByZW1hIGFtb3JlIGthdHJlc25hbiBzYXJhbmcgYW5wdSBwcmVtYSB5ZXU=")
-                )
+            BlockHeader(
+                prevHash = HashLight(),
+                interlinkHash = HashLight(),
+                bodyHash = HashLight.fromBase64("fNqaf98GZVkFrl29nFNUUUcbB4+m898OKH5bD7R6Vzo="),
+                accountsHash = HashLight.fromBase64("H+/UTx+pcYX9oh6VdUXJfcdkP6fk792G4KpCRNHgvFw="),
+                nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
+                height = 1U,
+                timestamp = 1523727000U,
+                nonce = 137689U,
+                version = 1U
+            ),
+            BlockInterlink(
+                hashes = arrayListOf(),
+                prevHash = HashLight(),
+                repeatBits = byteArrayOf(),
+                compressed = arrayListOf()
+            ),
+            BlockBody(
+                minerAddr = Address(),
+                transactions = arrayListOf(),
+                extraData = Base64.decode("bG92ZSBhaSBhbW9yIG1vaGFiYmF0IGh1YnVuIGNpbnRhIGx5dWJvdiBiaGFsYWJhc2EgYW1vdXIga2F1bmEgcGknYXJhIGxpZWJlIGVzaHEgdXBlbmRvIHByZW1hIGFtb3JlIGthdHJlc25hbiBzYXJhbmcgYW5wdSBwcmVtYSB5ZXU=")
+            )
         )
         genesisAccounts = loadResource("genesis_accounts_main.bin")
     }
@@ -103,28 +103,28 @@ object GenesisConfig {
         )
         seedLists = arrayListOf()
         genesisBlock = Block(
-                BlockHeader(
-                        prevHash = HashLight(),
-                        interlinkHash = HashLight(),
-                        bodyHash = HashLight.fromBase64("9rorv34UeKIJBXAARx1z+9wo3wtxd0fZKc/egpxBIPY="),
-                        accountsHash = HashLight.fromBase64("LgLaPRYuIPqYICnb3pzCD2tDGrBd8XZPNK9MYqTysz8="),
-                        nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
-                        height = 1U,
-                        timestamp = 1522735199U,
-                        nonce = 79001U,
-                        version = 1U
-                ),
-                BlockInterlink(
-                        hashes = arrayListOf(),
-                        prevHash = HashLight(),
-                        repeatBits = byteArrayOf(),
-                        compressed = arrayListOf()
-                ),
-                BlockBody(
-                        minerAddr = Address(),
-                        transactions = arrayListOf(),
-                        extraData = Base64.decode("bG92ZSBhaSBhbW9yIG1vaGFiYmF0IGh1YnVuIGNpbnRhIGx5dWJvdiBiaGFsYWJhc2EgYW1vdXIga2F1bmEgcGknYXJhIGxpZWJlIGVzaHEgdXBlbmRvIHByZW1hIGFtb3JlIGthdHJlc25hbiBzYXJhbmcgYW5wdSBwcmVtYSB5ZXU=")
-                )
+            BlockHeader(
+                prevHash = HashLight(),
+                interlinkHash = HashLight(),
+                bodyHash = HashLight.fromBase64("9rorv34UeKIJBXAARx1z+9wo3wtxd0fZKc/egpxBIPY="),
+                accountsHash = HashLight.fromBase64("LgLaPRYuIPqYICnb3pzCD2tDGrBd8XZPNK9MYqTysz8="),
+                nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
+                height = 1U,
+                timestamp = 1522735199U,
+                nonce = 79001U,
+                version = 1U
+            ),
+            BlockInterlink(
+                hashes = arrayListOf(),
+                prevHash = HashLight(),
+                repeatBits = byteArrayOf(),
+                compressed = arrayListOf()
+            ),
+            BlockBody(
+                minerAddr = Address(),
+                transactions = arrayListOf(),
+                extraData = Base64.decode("bG92ZSBhaSBhbW9yIG1vaGFiYmF0IGh1YnVuIGNpbnRhIGx5dWJvdiBiaGFsYWJhc2EgYW1vdXIga2F1bmEgcGknYXJhIGxpZWJlIGVzaHEgdXBlbmRvIHByZW1hIGFtb3JlIGthdHJlc25hbiBzYXJhbmcgYW5wdSBwcmVtYSB5ZXU=")
+            )
         )
         genesisAccounts = loadResource("genesis_accounts_test.bin")
     }
@@ -137,28 +137,28 @@ object GenesisConfig {
         )
         seedLists = arrayListOf()
         genesisBlock = Block(
-                BlockHeader(
-                        prevHash = HashLight(),
-                        interlinkHash = HashLight(),
-                        bodyHash = HashLight.fromBase64("JvMr9c9l2m8HWNdFAGTEastKH+aDZvln9EopXelhVIg="),
-                        accountsHash = HashLight.fromBase64("1t/Zm91tN0p178+ePcxyR5bPxvC6jFLskqiidFFO3wY="),
-                        nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
-                        height = 1U,
-                        timestamp = 1522338300U,
-                        nonce = 12432U,
-                        version = 1U
-                ),
-                BlockInterlink(
-                        hashes = arrayListOf(),
-                        prevHash = HashLight(),
-                        repeatBits = byteArrayOf(),
-                        compressed = arrayListOf()
-                ),
-                BlockBody(
-                        minerAddr = Address(),
-                        transactions = arrayListOf(),
-                        extraData = Base64.decode("RGV2TmV0")
-                )
+            BlockHeader(
+                prevHash = HashLight(),
+                interlinkHash = HashLight(),
+                bodyHash = HashLight.fromBase64("JvMr9c9l2m8HWNdFAGTEastKH+aDZvln9EopXelhVIg="),
+                accountsHash = HashLight.fromBase64("1t/Zm91tN0p178+ePcxyR5bPxvC6jFLskqiidFFO3wY="),
+                nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
+                height = 1U,
+                timestamp = 1522338300U,
+                nonce = 12432U,
+                version = 1U
+            ),
+            BlockInterlink(
+                hashes = arrayListOf(),
+                prevHash = HashLight(),
+                repeatBits = byteArrayOf(),
+                compressed = arrayListOf()
+            ),
+            BlockBody(
+                minerAddr = Address(),
+                transactions = arrayListOf(),
+                extraData = Base64.decode("RGV2TmV0")
+            )
         )
         genesisAccounts = loadResource("genesis_accounts_dev.bin")
     }
@@ -175,28 +175,28 @@ object GenesisConfig {
         )
         seedLists = arrayListOf()
         genesisBlock = Block(
-                BlockHeader(
-                        prevHash = HashLight(),
-                        interlinkHash = HashLight(),
-                        bodyHash = HashLight.fromBase64("nPcJa/7i0KYsiPQ8FPOgvLYgpP3m05UMwPfIPJAdAvI="),
-                        accountsHash = HashLight.fromBase64("sXZsIZDV40vD7NDdrnSk2tOsPMKKit/vH0xvz1RXmQo="),
-                        nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
-                        height = 1U,
-                        timestamp = 1522338300U,
-                        nonce = 67058U,
-                        version = 1U
-                ),
-                BlockInterlink(
-                        hashes = arrayListOf(),
-                        prevHash = HashLight(),
-                        repeatBits = byteArrayOf(),
-                        compressed = arrayListOf()
-                ),
-                BlockBody(
-                        minerAddr = Address(),
-                        transactions = arrayListOf(),
-                        extraData = Base64.decode("Qm91bnR5TmV0")
-                )
+            BlockHeader(
+                prevHash = HashLight(),
+                interlinkHash = HashLight(),
+                bodyHash = HashLight.fromBase64("nPcJa/7i0KYsiPQ8FPOgvLYgpP3m05UMwPfIPJAdAvI="),
+                accountsHash = HashLight.fromBase64("sXZsIZDV40vD7NDdrnSk2tOsPMKKit/vH0xvz1RXmQo="),
+                nBits = BlockUtils.difficultyToCompact(BigInteger.ONE),
+                height = 1U,
+                timestamp = 1522338300U,
+                nonce = 67058U,
+                version = 1U
+            ),
+            BlockInterlink(
+                hashes = arrayListOf(),
+                prevHash = HashLight(),
+                repeatBits = byteArrayOf(),
+                compressed = arrayListOf()
+            ),
+            BlockBody(
+                minerAddr = Address(),
+                transactions = arrayListOf(),
+                extraData = Base64.decode("Qm91bnR5TmV0")
+            )
         )
         genesisAccounts = loadResource("genesis_accounts_bounty.bin")
     }

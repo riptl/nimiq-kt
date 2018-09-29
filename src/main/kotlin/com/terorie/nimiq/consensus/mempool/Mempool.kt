@@ -11,7 +11,7 @@ import java.util.*
 import kotlin.collections.HashSet
 
 @ExperimentalUnsignedTypes
-class Mempool(val blockchain: IBlockchain, val accounts: Accounts) {
+open class Mempool(val blockchain: IBlockchain, val accounts: Accounts) {
 
     enum class ReturnCode(id: Int) {
         FEE_TOO_LOW(-2),
@@ -33,7 +33,7 @@ class Mempool(val blockchain: IBlockchain, val accounts: Accounts) {
     val txSetBySender = HashMap<Address, MempoolTransactionSet>()
     val txSetByRecipient = HashMap<Address, HashSet<HashLight>>()
 
-    fun pushTransaction(tx: Transaction): ReturnCode {
+    open fun pushTransaction(tx: Transaction): ReturnCode {
         // Check if we already know this transaction.
         if (txByHash.contains(tx.hash))
             return ReturnCode.KNOWN

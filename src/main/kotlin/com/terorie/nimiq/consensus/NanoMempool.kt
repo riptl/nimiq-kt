@@ -10,27 +10,27 @@ import com.terorie.nimiq.consensus.primitive.HashLight
 import com.terorie.nimiq.consensus.transaction.Transaction
 
 @ExperimentalUnsignedTypes
-class NanoMempool(private val blockchain: IBlockchain) : Mempool(blockchain) {
+class NanoMempool(blockchain: IBlockchain) : Mempool(blockchain) {
 
     val txByHash = HashMap<HashLight, Transaction>()
     val txSetByAddress = HashMap<Address, MempoolTransactionSet>()
 
-    fun pushTransaction(tx: Transaction): Boolean {
+    override fun pushTransaction(tx: Transaction): ReturnCode {
         // Check if we already know this transaction.
         if (txByHash.contains(tx.hash)) {
             // TODO log
-            return false
+            return ReturnCode.KNOWN
         }
 
         // Check validity based on startHeight
         if (blockchain.height >= tx.validityStartHeight) {
             // TODO log
-            return false
+            return ReturnCode.INVALID
         }
 
         // Verify transaction.
         if (!tx.verify())
-            return false
+            return ReturnCode.INVALID
 
         // Transaction is valid, add it to the mempool.
         txByHash[tx.hash] = tx
@@ -40,7 +40,7 @@ class NanoMempool(private val blockchain: IBlockchain) : Mempool(blockchain) {
 
         // TODO Tell listeners about the new transaction we received.
 
-        return true
+        return ReturnCode.ACCEPTED
     }
 
     fun getTransaction(hash: HashLight) = txByHash[hash]

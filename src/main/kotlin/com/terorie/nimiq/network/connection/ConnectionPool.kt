@@ -1,15 +1,16 @@
 package com.terorie.nimiq.network.connection
 
+import com.terorie.nimiq.consensus.blockchain.IBlockchain
 import com.terorie.nimiq.network.NetworkConfig
 import com.terorie.nimiq.network.address.PeerAddress
 import com.terorie.nimiq.network.address.PeerAddressBook
 
 @ExperimentalUnsignedTypes
 class ConnectionPool(
-        val peerAddresses: PeerAddressBook,
-        val networkConfig: NetworkConfig,
-        val blockchain: Blockchain,
-        val time: UInt
+    val peerAddresses: PeerAddressBook,
+    val networkConfig: NetworkConfig,
+    val blockchain: IBlockchain,
+    val time: UInt
 ) {
 
     companion object {

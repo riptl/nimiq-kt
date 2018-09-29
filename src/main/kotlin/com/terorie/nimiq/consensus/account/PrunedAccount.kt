@@ -26,15 +26,11 @@ data class PrunedAccount(val address: Address, val account: Account): Comparable
         }
     }
 
-    fun serialize(s: OutputStream) {
-
-    }
-
     var _hash: HashLight? = null
     val hash: HashLight
         get() {
             if (_hash == null)
-                _hash = HashLight(assemble { serialize(it) })
+                _hash = HashLight(assemble { serialize(it, this) })
             return _hash!!
         }
 

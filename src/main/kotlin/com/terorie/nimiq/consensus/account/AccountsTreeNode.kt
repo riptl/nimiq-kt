@@ -45,6 +45,9 @@ abstract class AccountsTreeNode(val prefix: String) {
     abstract val hasSingleChild: Boolean
     abstract val hasChildren: Boolean
 
+    fun withAccount(account: Account) =
+        AccountsTreeTerminal(prefix, account)
+
     fun isChildOf(parent: AccountsTreeBranch): Boolean =
         parent.childSuffixes.contains(prefix)
 

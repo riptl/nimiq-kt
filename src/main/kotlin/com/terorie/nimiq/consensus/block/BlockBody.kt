@@ -33,7 +33,7 @@ class BlockBody(
             val numTxs = s.readUShort().toInt()
             val txs = ArrayList<Transaction>(numTxs)
             for (i in 0 until numTxs)
-                txs[i] = Transaction.unserialize(s)
+                txs[i] = Transaction.deserialize(s)
             val numPrunedAccs = s.readUShort().toInt()
             val prunedAccs = ArrayList<PrunedAccount>()
             for (i in 0 until numPrunedAccs)
@@ -47,9 +47,9 @@ class BlockBody(
             s.writeUByte(extraData.size)
             s.write(extraData)
             s.writeUShort(transactions.size)
-            transactions.forEach { it.serialize(s) }
+            transactions.forEach { Transaction.serialize(s, it) }
             s.writeUShort(prunedAccounts.size)
-            prunedAccounts.forEach{ it.serialize(s) }
+            prunedAccounts.forEach{ PrunedAccount.serialize(s, it) }
         }
     }
 
