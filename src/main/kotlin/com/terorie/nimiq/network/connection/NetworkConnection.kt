@@ -12,7 +12,7 @@ import java.net.InetAddress
 class NetworkConnection(
     private val channel: DataChannel,
     val protocol: Protocol,
-    val inetAddress: InetAddress,
+    var inetAddress: InetAddress?,
     val peerAddress: PeerAddress?
 ) {
 

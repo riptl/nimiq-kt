@@ -7,6 +7,7 @@ import com.terorie.nimiq.consensus.primitive.HashLight
 import com.terorie.nimiq.consensus.transaction.Transaction
 import com.terorie.nimiq.network.Peer
 import com.terorie.nimiq.network.connection.CloseType
+import com.terorie.nimiq.network.message.ChainProofMessage
 import com.terorie.nimiq.network.message.InvVector
 import com.terorie.nimiq.network.message.Message
 import java.lang.IllegalArgumentException
@@ -31,7 +32,7 @@ class NanoConsensusAgent(
 
     init {
         // Listen to consensus messages from the peer.
-        peer.channel.on("chain-proof", )
+        //peer.channel.on("chain-proof", )
     }
 
     private var syncing = false

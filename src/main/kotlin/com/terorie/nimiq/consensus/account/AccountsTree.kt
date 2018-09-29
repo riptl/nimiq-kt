@@ -141,6 +141,83 @@ open class AccountsTree(private val store: AccountsTreeStore) {
         return
     }
 
+    fun getAccountsProof(addresses: List<Address>): AccountsProof {
+        val rootNode = store.getRootNode()
+            ?: throw IllegalStateException("Corrupted store: Failed to fetch AccountsTree root node")
+
+        val prefixes = addresses.mapTo(ArrayList()) { it.toHex() }
+        // We sort the addresses to simplify traversal in post order (leftmost addresses first).
+        prefixes.sort()
+
+        val nodes = ArrayList<AccountsTreeNode>()
+        doGetAccountsProof(rootNode, prefixes, nodes)
+
+        return AccountsProof(nodes.toTypedArray())
+    }
+
+    /**
+     * Constructs the accounts proof in post-order.
+     */
+    private fun doGetAccountsProof(node: AccountsTreeNode, prefixes: List<String>, nodes: ArrayList<AccountsTreeNode>): Boolean {
+        // For each prefix, descend the tree individually.
+        var includeNode = false
+        var i = 0
+        while (i < prefixes.size) {
+            val prefix = prefixes[i]
+
+            // Find common prefix between node and the current requested prefix.
+            val commonPrefix = node.prefix.commonPrefixWith(prefix)
+
+            // If the prefix fully matches, we have found the requested node.
+            // If the prefix does not fully match, the requested address is not part of this node.
+            // Include the node in the proof nevertheless to prove that the account doesn't exist.
+            if (commonPrefix.length != node.prefix.length
+                    || node.prefix == prefix) {
+                includeNode = true
+                i++
+                continue
+            }
+
+            // Descend into the matching child node if one exists.
+            val childKey = node.getChild(prefix)
+            if (childKey != null) {
+                val childNode = store.get(childKey)!!
+
+                // Group addresses with same prefix:
+                // Because of our ordering, they have to be located next to the current prefix.
+                // Hence, we iterate over the next prefixes, until we don't find commonalities anymore.
+                // In the next main iteration we can skip those we already requested here.
+                val subPrefixes = arrayListOf(prefix)
+                // Find other prefixes to descend into this tree as well.
+                var j = i + 1
+                while (j < prefixes.size) {
+                    // Since we ordered prefixes, there can't be any other prefixes with commonalities.
+                    if (!prefixes[j].startsWith(childNode.prefix))
+                        break
+                    // But if there is a commonality, add it to the list.
+                    subPrefixes.add(prefixes[j])
+                    j++
+                }
+                // Now j is the last index which doesn't have commonalities,
+                // we continue from there in the next iteration.
+                i = j
+
+                includeNode = doGetAccountsProof(childNode, subPrefixes, nodes) || includeNode
+            }
+            // No child node exists with the requested prefix. Include the current node to prove the absence of the requested account.
+            else {
+                includeNode = true
+                i++
+            }
+        }
+
+        // If this branch contained at least one account, we add this node.
+        if (includeNode)
+            nodes.add(node)
+
+        return includeNode
+    }
+
     //fun synchronousTransaction(enableWatchdog: Boolean = true) = TODO()
 
 }

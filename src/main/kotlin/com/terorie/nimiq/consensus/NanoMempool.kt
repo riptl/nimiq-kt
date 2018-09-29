@@ -12,7 +12,6 @@ import com.terorie.nimiq.consensus.transaction.Transaction
 @ExperimentalUnsignedTypes
 class NanoMempool(blockchain: IBlockchain) : Mempool(blockchain) {
 
-    val txByHash = HashMap<HashLight, Transaction>()
     val txSetByAddress = HashMap<Address, MempoolTransactionSet>()
 
     override fun pushTransaction(tx: Transaction): ReturnCode {

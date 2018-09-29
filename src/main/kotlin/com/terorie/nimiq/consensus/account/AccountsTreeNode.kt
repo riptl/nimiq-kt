@@ -51,6 +51,8 @@ abstract class AccountsTreeNode(val prefix: String) {
     fun isChildOf(parent: AccountsTreeBranch): Boolean =
         parent.childSuffixes.contains(prefix)
 
+    abstract fun getChild(prefix: String): String?
+
 }
 
 @ExperimentalUnsignedTypes
@@ -150,7 +152,7 @@ class AccountsTreeBranch(
     fun getChildren(): Sequence<String> =
         childSuffixes.asSequence().filterNotNull()
 
-    fun getChild(prefix: String): String? {
+    override fun getChild(prefix: String): String? {
         val suffix = childSuffixes[getChildIndex(prefix)]
             ?: return null
         return this.prefix + suffix
@@ -176,5 +178,7 @@ class AccountsTreeTerminal(
 
     override val hasSingleChild = false
     override val hasChildren = false
+
+    override fun getChild(prefix: String): String? = null
 
 }

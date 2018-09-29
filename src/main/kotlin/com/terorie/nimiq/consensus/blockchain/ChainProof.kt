@@ -2,10 +2,19 @@ package com.terorie.nimiq.consensus.blockchain
 
 import com.terorie.nimiq.consensus.Policy
 import com.terorie.nimiq.consensus.block.BlockUtils
+import com.terorie.nimiq.util.io.Enc
+import java.io.InputStream
+import java.io.OutputStream
 import java.math.BigInteger
 
 @ExperimentalUnsignedTypes
 class ChainProof(val prefix: BlockChain, val suffix: HeaderChain) {
+
+    companion object : Enc<ChainProof> {
+        override fun serializedSize(o: ChainProof): Int = TODO()
+        override fun deserialize(s: InputStream): ChainProof = TODO()
+        override fun serialize(s: OutputStream, o: ChainProof) = TODO()
+    }
 
     fun verify(): Boolean {
         // Check that the prefix chain is anchored.

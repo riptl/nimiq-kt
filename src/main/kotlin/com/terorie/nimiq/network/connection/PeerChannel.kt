@@ -4,9 +4,11 @@ import com.terorie.nimiq.network.DataChannel
 import com.terorie.nimiq.network.message.InvVector
 import com.terorie.nimiq.network.message.InventoryMessage
 import com.terorie.nimiq.network.message.Message
+import com.terorie.nimiq.util.io.assemble
+import java.net.InetAddress
 
 @ExperimentalUnsignedTypes
-class PeerChannel {
+class PeerChannel(val conn: NetworkConnection) {
 
     fun expectMessage(
             types: Array<Message.Type>,
@@ -20,6 +22,10 @@ class PeerChannel {
         send(InventoryMessage(Message.Type.GET_HEADER, vectors))
 
     private fun send(msg: Message) =
-        conn.send(msg.serialize())
+        conn.send(assemble { msg.serialize(it) })
+
+    var inetAddress: InetAddress?
+        get() = conn.inetAddress
+        set(value) { conn.inetAddress = value }
 
 }

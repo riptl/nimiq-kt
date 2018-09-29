@@ -16,4 +16,6 @@ class WebSocketDataChannel(val session: Session) : DataChannel() {
         else -> ReadyState.CLOSED
     }
 
+    override fun close() = TODO()
+
 }
