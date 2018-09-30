@@ -1,9 +1,11 @@
 /lib/
 /.idea/
 *.iml
+.DS_Store
 
 # Gradle
 /.gradle/
 /gradlew
 /gradlew.bat
 /gradle
+/build/

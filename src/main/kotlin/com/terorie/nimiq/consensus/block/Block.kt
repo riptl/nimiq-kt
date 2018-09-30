@@ -14,9 +14,9 @@ import kotlin.math.max
 
 @ExperimentalUnsignedTypes
 class Block(
-        val header: BlockHeader,
-        val interlink: BlockInterlink,
-        val body: BlockBody?
+    val header: BlockHeader,
+    val interlink: BlockInterlink,
+    val body: BlockBody?
 ) {
 
     companion object : Enc<Block> {
