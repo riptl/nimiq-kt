@@ -10,43 +10,43 @@ import java.lang.IllegalStateException
 abstract class Message(val type: Type) {
 
     enum class Type(val id: ULong) {
-        VERSION(0),
-        INV(1),
-        GET_DATA(2),
-        GET_HEADER(3),
-        NOT_FOUND(4),
-        GET_BLOCKS(5),
-        BLOCK(6),
-        HEADER(7),
-        TX(8),
-        MEMPOOL(9),
-        REJECT(10),
-        SUBSCRIBE(11),
+        VERSION(0U),
+        INV(1U),
+        GET_DATA(2U),
+        GET_HEADER(3U),
+        NOT_FOUND(4U),
+        GET_BLOCKS(5U),
+        BLOCK(6U),
+        HEADER(7U),
+        TX(8U),
+        MEMPOOL(9U),
+        REJECT(10U),
+        SUBSCRIBE(11U),
 
-        ADDR(20),
-        GET_ADDR(21),
-        PING(22),
-        PONG(23),
+        ADDR(20U),
+        GET_ADDR(21U),
+        PING(22U),
+        PONG(23U),
 
-        SIGNAL(30),
+        SIGNAL(30U),
 
-        GET_CHAIN_PROOF(40),
-        CHAIN_PROOF(41),
-        GET_ACCOUNTS_PROOF(42),
-        ACCOUNTS_PROOF(43),
-        GET_ACCOUNTS_TREE_CHUNK(44),
-        ACCOUNTS_TREE_CHUNK(45),
-        GET_TRANSACTIONS_PROOF(47),
-        TRANSACTIONS_PROOF(48),
-        GET_TRANSACTION_RECEIPTS(49),
-        TRANSACTION_RECEIPTS(50),
-        GET_BLOCK_PROOF(51),
-        BLOCK_PROOF(52),
+        GET_CHAIN_PROOF(40U),
+        CHAIN_PROOF(41U),
+        GET_ACCOUNTS_PROOF(42U),
+        ACCOUNTS_PROOF(43U),
+        GET_ACCOUNTS_TREE_CHUNK(44U),
+        ACCOUNTS_TREE_CHUNK(45U),
+        GET_TRANSACTIONS_PROOF(47U),
+        TRANSACTIONS_PROOF(48U),
+        GET_TRANSACTION_RECEIPTS(49U),
+        TRANSACTION_RECEIPTS(50U),
+        GET_BLOCK_PROOF(51U),
+        BLOCK_PROOF(52U),
 
-        GET_HEAD(60),
-        HEAD(61),
+        GET_HEAD(60U),
+        HEAD(61U),
 
-        VERACK(90),
+        VERACK(90U),
         ;
 
         companion object {
@@ -101,7 +101,7 @@ abstract class MessageEnc<T : Message> : Enc<T> {
         s.writeUInt(MAGIC)
         s.writeVarUInt(o.type.id)
         s.writeUInt(serializedSize(o).toUInt())
-        s.writeUInt(0) // Placeholder checksum
+        s.writeUInt(0U) // Placeholder checksum
         serializeContent(s, o)
     }
 
@@ -125,4 +125,10 @@ abstract class MessageEnc<T : Message> : Enc<T> {
     }
 
     abstract fun deserializeContent(s: InputStream, h: Header): T
+}
+
+@ExperimentalUnsignedTypes
+abstract class EmptyMessageEnc<T : Message> : MessageEnc<T>() {
+    override fun serializedContentSize(m: T) = 0
+    override fun serializeContent(s: OutputStream, m: T) = Unit
 }

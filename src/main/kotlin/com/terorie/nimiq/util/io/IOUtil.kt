@@ -32,6 +32,18 @@ fun <T> InputStream.read(enc: Enc<T>): T =
 fun <T> OutputStream.write(enc: Enc<T>, o: T) =
     enc.serialize(this, o)
 
+fun InputStream.readBool(): Boolean {
+    val n = read()
+    return when {
+        n == 0 -> false
+        n > 0  -> true
+        else   -> throw EOFException()
+    }
+}
+
+fun OutputStream.writeBool(x: Boolean) =
+    write(if (x) 1 else 0)
+
 @ExperimentalUnsignedTypes
 fun InputStream.readUByte(): UByte {
     val n = read()
@@ -119,12 +131,12 @@ fun InputStream.readVarUInt(): ULong {
 
 @ExperimentalUnsignedTypes
 fun OutputStream.writeVarUInt(x: ULong) = when {
-    x < 0xFD -> writeUByte(x.toUByte())
-    x < 0x1_0000 -> {
+    x < 0xFDU -> writeUByte(x.toUByte())
+    x < 0x1_0000U -> {
         writeUByte(0xFD)
         writeUShort(x.toUShort())
     }
-    x < 0x1_0000_0000 -> {
+    x < 0x1_0000_0000U -> {
         writeUByte(0xFE)
         writeUInt(x.toUInt())
     }
@@ -136,9 +148,9 @@ fun OutputStream.writeVarUInt(x: ULong) = when {
 
 @ExperimentalUnsignedTypes
 fun varUIntSize(x: ULong) = when {
-    x < 0xFD -> 1
-    x < 0x1_0000 -> 3
-    x < 0x1_0000_0000 -> 5
+    x < 0xFDU -> 1
+    x < 0x1_0000U -> 3
+    x < 0x1_0000_0000U -> 5
     else -> 9
 }
 
