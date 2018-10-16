@@ -2,9 +2,33 @@ package com.terorie.nimiq.consensus.blockchain
 
 import com.terorie.nimiq.consensus.GenesisConfig
 import com.terorie.nimiq.consensus.block.Block
+import com.terorie.nimiq.util.io.*
+import java.io.InputStream
+import java.io.OutputStream
 
 @ExperimentalUnsignedTypes
-class BlockChain(val blocks: ArrayList<Block>) {
+class BlockChain(val blocks: MutableList<Block>) {
+
+    companion object : Enc<BlockChain> {
+        override fun serializedSize(o: BlockChain): Int {
+            var x = 2
+            for (block in o.blocks)
+                x += Block.serializedSize(block)
+            return x
+        }
+
+        override fun deserialize(s: InputStream) = BlockChain(
+            blocks = Array(s.readUShort().toInt()) {
+                s.read(Block)
+            }.toMutableList()
+        )
+
+        override fun serialize(s: OutputStream, o: BlockChain) {
+            s.writeUShort(o.blocks.size)
+            for (block in o.blocks)
+                s.write(Block, block)
+        }
+    }
 
     fun verify(): Boolean {
         // For performance reasons, we DO NOT VERIFY the validity of the blocks in the chain here.

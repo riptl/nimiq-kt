@@ -7,6 +7,11 @@ import java.io.InputStream
 import java.io.OutputStream
 import kotlin.text.Charsets.US_ASCII
 
+@ExperimentalUnsignedTypes
+fun OutputStream.write(b: UByteArray) {
+    write(b.asByteArray())
+}
+
 fun InputStream.readFull(n: Int) =
     ByteArray(n).apply { readFull(this) }
 
