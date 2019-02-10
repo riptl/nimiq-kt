@@ -1,5 +1,3 @@
 ### nimiq-kt
 
-WIP Rewrite of https://github.com/nimiq-network/core
-
-Probably won't compile rn :P
+Archived since [`core-rs`](https://github.com/nimiq/core-rs) exists
